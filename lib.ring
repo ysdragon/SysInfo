@@ -17,7 +17,7 @@ class SysInfo {
         // Convert returned json to list
         winSysInfo = json2List(cmd)
         // Remove winSysInfo.ps1 script
-	    remove("winSysInfo.ps1")
+        remove("winSysInfo.ps1")
     }
 
     // Function to get the hostname
@@ -77,8 +77,8 @@ class SysInfo {
         if(isWindows()) {
             // Get Windows NT Kernel version from winSysInfo
             kVersion = winSysInfo[:version]
-            // Return Windows NT Kernel version
 
+            // Return Windows NT Kernel version
             return kVersion
         else // Else (If the OS is (Unix-like))
             // Execute command to get Kernel from Unix-Like OSes
