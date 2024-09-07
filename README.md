@@ -15,7 +15,7 @@
 Using Ring Package Manager **`ringpm`**
 
 ```bash
-ringpm install SysInfo from ysdragon
+ringpm install SysInfo
 ```
 
 ## Example
