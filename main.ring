@@ -8,7 +8,8 @@ func main() {
     ** Author: ysdragon (https://github.com/ysdragon)	 **
 
     Example:
-
+        // Load SysInfo Package
+        load "SysInfo.ring"
         // Create a new instance of the SysInfo class
         sys = new SysInfo
         // Get OS name
