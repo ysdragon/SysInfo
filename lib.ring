@@ -270,25 +270,46 @@ class SysInfo {
             for blockDevice in blockDevices {
                 // Loop every children in blockDevice (disk part)
                 for children in blockDevice[:children] {
-                    // Loop every mountpoint in children (disk part)
-                    for mountpoint in children[:mountpoints] {
-                        // Check if mountpoint value not "null"
-                        if (mountpoint != "null") {
-                            // Execute command to get specific children (part) (name, size, used, free)
-                            childrenInfo = SystemCmd("df -h --output=source,size,used,avail | grep '" + children[:name] + "' | sed -E 's/[[:space:]]+/-/g; s/(.*):/\1:/' | sed 's/$/-/'")
-                            // Split
-                            childrenInfo = split(childrenInfo, "-")
-                            // Get childrenName (part name)
-                            childrenName = childrenInfo[1]
-                            // Get childrenSize (part size)
-                            childrenSize = childrenInfo[2]
-                            // Get childrenUsed (part used size)
-                            childrenUsed = childrenInfo[3]
-                            // Get childrenFree (part free size)
-                            childrenFree = childrenInfo[4]
+                    // Check if mountpoints is not null or empty
+                    if (children[:mountpoints] != NULL and len(children[:mountpoints]) > 0) {
+                        // Initialize isValidMountPoint
+                        isValidMountPoint = false
+                        
+                        // Loop every mountpoint in children (disk part)
+                        for mountpoint in children[:mountpoints] {
+                            // Check if mountpoint value is not "null"
+                            if (mountpoint != "null") {
+                                isValidMountPoint = true
+                                break
+                            }
+                        }
 
-                            // Add children (part) to StorageParts
-                            add(storageParts, [:name = childrenName, :size = childrenSize, :used = childrenUsed, :free = childrenFree])
+                        // Execute the command if a valid mountpoint was found
+                        if (isValidMountPoint) {
+                            try {
+                                // Execute command to get specific children (part) (name, size, used, free)
+                                childrenInfo = SystemCmd("df -h --output=source,size,used,avail | grep '" + children[:name] + "' | sed -E 's/[[:space:]]+/-/g; s/(.*):/\1:/' | sed 's/$/-/'")
+                                // Split the output
+                                childrenInfo = split(childrenInfo, "-")
+                                
+                                // Ensure we have enough list items
+                                if (len(childrenInfo) = 4) {
+                                    // Get childrenName (part name)
+                                    childrenName = childrenInfo[1]
+                                    // Get childrenSize (part size)
+                                    childrenSize = childrenInfo[2]
+                                    // Get childrenUsed (part used size)
+                                    childrenUsed = childrenInfo[3]
+                                    // Get childrenFree (part free size)
+                                    childrenFree = childrenInfo[4]
+
+                                    // Add children (part) to StorageParts
+                                    add(storageParts, [:name = childrenName, :size = childrenSize, :used = childrenUsed, :free = childrenFree])
+                                }
+                            catch 
+                                // Handle the error
+                                ? "Error: " + cCatchError
+                            }
                         }
                     }
                 }
