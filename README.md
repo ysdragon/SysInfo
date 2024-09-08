@@ -12,11 +12,21 @@
 - etc?
 
 ## How to install?
-Using Ring Package Manager **`ringpm`**
+#### Using Ring Package Manager **`ringpm`**
 
+#### From ringpm registry
 ```bash
 ringpm install SysInfo
 ```
+> [!NOTE]  
+> Run `ringpm refresh` first.
+
+#### You can also install it from here
+```bash
+ringpm install SysInfo from ysdragon 
+```
+> [!NOTE]  
+> If you want to update to a new version run `ringpm update SysInfo`.
 
 ## Example
 #### A Complete good example called ***RingFetch*** is available [Here](https://github.com/ysdragon/SysInfo/tree/main/examples)
