@@ -195,7 +195,7 @@ class SysInfo {
             ramInfo = []
             
             // Execute command to get Ram info
-            memInfo = SystemCmd("cat /proc/meminfo")
+            memInfo = SystemCmd("grep -E 'MemTotal|MemAvailable' /proc/meminfo")
             // Split memInfo into lines
             memInfo = split(memInfo, "\n")
 
@@ -208,21 +208,21 @@ class SysInfo {
             // Convert from kB to GB
             totalRam = totalRam / 1024 / 1024
 
-            // Split to get used ram
-            usedRam = split(memInfo[3], ":")
+            // Split to get free ram
+            freeRam = split(memInfo[2], ":")
             // Trim spaces
-            usedRam = trim(usedRam[2])
+            freeRam = trim(freeRam[2])
             // Remove kB
-            usedRam = substr(usedRam, "kB", "")
+            freeRam = substr(freeRam, "kB", "")
             // Convert from kB to GB
-            usedRam = usedRam / 1024 / 1024
+            freeRam = freeRam / 1024 / 1024
             
             // Add size to ramInfo
             ramInfo[:size] = totalRam
-            // Add used to ramInfo
-            ramInfo[:used] = usedRam
-            // Calculate and add free to ramInfo
-            ramInfo[:free] = totalRam - usedRam
+            // Calculate and add used to ramInfo
+            ramInfo[:used] = totalRam - freeRam
+            // Add free to ramInfo
+            ramInfo[:free] = freeRam
             
             // Return Ram info
             return ramInfo
