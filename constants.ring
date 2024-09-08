@@ -59,7 +59,7 @@ Write-Output (ConvertTo-Json $Result)
 pManagers = [
     :dpkg = [:supported = ["debian", "ubuntu", "devuan", "rhino", "mint", "osmc", "antix", "pop", "popos", "elementary", "vanilla", "sparky", "kali", "kubuntu", "deepin", "tails", "voyager", "damnsmall", "q4os", "lubuntu", "parrot", "endless", "wattos", "watt", "qubes", "qubesos", "xubuntu", "bodhi", "gnoppix", "relianoid", "av", "avlinux", "pure", "pureos", "bros", "br", "spiral", "syslinux", "syslinuxos", "mate", "ubuntumate", "neptune", "lxle", "makulu", "emmabuntüs", "bunsenLabs", "kodachi", "nitrux"], :cmd = "dpkg-query -f '${binary:Package}\n' -W | wc -l", :name = "dpkg"],
     :dnf =  [:supported = ["fedora", "centos", "alma", "rocky", "mageia", "openmandriva", "ultramarine", "redhat", "oracle"], :cmd = "dnf list installed | wc -l", :name = "rpm"],
-    :zypper = [:supported = ["opensuse", "regata"], :cmd = "zypper se | wc -l", :name = "zypper"],
+    :zypper = [:supported = ["opensuse", "opensuse-tumbleweed", "regata"], :cmd = "zypper se --installed-only | wc -l", :name = "zypper"],
     :pacman = [:supported = ["arch", "artix", "endeavouros", "endeavour", "manjaro", "cachyos", "cachy", "garuda", "arco", "arcolinux", "archcraft", "bluestar", "sdesk", "biglinux", "big", "reborn", "rebornos", "blendos", "blend", "mabox", "athena"], :cmd = "pacman -Q | wc -l", :name = "pacman"],
     :emerge = [:supported = ["gentoo", "fentoo", "calculate"], :cmd = "qlist -I | wc -l", :name = "emerge"],
     :pkg = [:supported = ["freebsd", "openbsd", "ghostbsd", "netbsd"], :cmd = "pkg info | wc -l | tr -d ' '", :name = "pkg"],
