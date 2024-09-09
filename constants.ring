@@ -10,7 +10,13 @@ $CPU = @{
     cores = $CPU_INFO.NumberOfCores
     threads = $CPU_INFO.NumberOfLogicalProcessors
 }
-$GPU = (Get-CimInstance -Query 'SELECT Caption FROM Win32_VideoController')
+$GPU_INFO = (Get-CimInstance -Query 'SELECT Caption FROM Win32_VideoController')
+$GPUs = @()
+foreach ($GPU in $GPU_INFO) {
+    $GPUs += @{
+        name = $GPU.Caption
+    }
+}
 $OS = (Get-CimInstance -Query 'SELECT Caption, Version, FreePhysicalMemory FROM Win32_OperatingSystem')
 $TOTAL_RAM = [math]::round((Get-CimInstance -Query 'SELECT Capacity FROM Win32_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1GB, 2)
 $FREE_RAM = [math]::round($OS.FreePhysicalMemory / 1MB, 2)
@@ -43,7 +49,7 @@ $PCOUNT = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Unin
 $SHELL = 'PowerShell ' + $PSVersionTable.PSVersion.ToString()
 $Result = @{
     cpu = $CPU
-    gpu = $GPU.Caption
+    gpu = $GPUs
     ram = $RAM
     uptime = ((Get-Date) - $BOOT.LastBootUpTime).TotalSeconds
     os = $OS.Caption

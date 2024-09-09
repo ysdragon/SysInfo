@@ -56,6 +56,7 @@ class SysInfo {
         if(isWindows()) {
             // Get os from winSysInfo List
             osName = winSysInfo[:os]    
+
             // Return os name         
             return osName
         else // Else (If the OS is (Unix-like))
@@ -140,10 +141,25 @@ class SysInfo {
     func gpu() {
         // Check if the OS is Windows
         if(isWindows()) {
-            // Get GPU name from winSysInfo list
-            gpuName = winSysInfo[:gpu]
-            // Return GPU name
+            // Get GPU info from winSysInfo list
+            gpuInfo = winSysInfo[:gpu]
 
+            // Initialize gpuName
+            gpuName = ""
+
+            // Check if the length of gpuInfo greater than 1
+            if(len(gpuInfo) > 1) {
+                // Loop in every GPU
+                for i=1 to len(gpuInfo) {
+                    gpuName += "GPU" + i + ": " + gpuInfo[i][:name] + " "
+                }
+            elseif(len(gpuInfo) = 1) // If there's only one GPU return its model name
+                gpuName = gpuInfo[1][:name]
+            else  // If there's no GPU detected
+                gpuName = "No GPU detected!"
+            }
+
+            // Return GPU name
             return gpuName
         else // Else (If the OS is (Unix-like))
             try {
@@ -188,6 +204,7 @@ class SysInfo {
         if(isWindows()) {
             // Get Ram info (size, used, free) from winSysInfo
             ramInfo = winSysInfo[:ram]
+
             // Return Ram info
             return ramInfo
         else // Else (If the OS is (Unix-like))
@@ -261,6 +278,7 @@ class SysInfo {
         if(isWindows()) {
             // Get storage parts from winSysInfo (name, size, used, free)
             storageParts = winSysInfo[:parts]
+
             // Return storageParts
             return storageParts
         else // Else (If the OS is (Unix-like))
@@ -397,7 +415,7 @@ class SysInfo {
 
     // Function to get OS id (For Unix-like OS only)
     func osID() {
-        //If the OS is not Windows (Unix-like)
+        // If the OS is not Windows (Unix-like)
         if(!isWindows()) { 
             // Execute command to get OS ID
             osInfo = SystemCmd("cat /etc/os-release | grep ^ID=")
