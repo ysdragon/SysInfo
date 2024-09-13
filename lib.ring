@@ -252,6 +252,7 @@ class SysInfo {
         if(isWindows()) {
             // Get storage disks (name, size) from winSysInfo
             storageDisks = winSysInfo[:disks]
+            
             // Return storage disks
             return storageDisks
         else // Else (If the OS is (Unix-like))
@@ -348,33 +349,21 @@ class SysInfo {
         if(isWindows()) {
             // Get uptime from winSysInfo
             uptimeInfo = winSysInfo[:uptime]
-            // Calculate total hours
-            totalHours = uptimeInfo / 60 / 60
-            // Calculate total days by dividing total hours by 24
-            totalDays = totalHours / 24
-            // Calculate the remaining hours after converting total hours into full days
-            hours = totalHours % 24
-            // Add given uptime in this format (% days, % hours)
-            fUptime = string(totalDays) + " days, " + hours + " hours"
-
+            // Get calculated uptimeInfo
+            fUptime = calcUptime(uptimeInfo)
+            
             // Return uptime
             return fUptime
         else // Else (If the OS is (Unix-like))
             // Execute command to get uptime
             uptimeInfo = SystemCmd("cat /proc/uptime")
-            // Split
+            // Split the output
             uptimeInfo = split(uptimeInfo, " ")
             // Get uptime
             uptimeInfo = uptimeInfo[1]
-            // Calculate total hours
-            totalHours = uptimeInfo / 60 / 60
-            // Calculate total days by dividing total hours by 24
-            totalDays = totalHours / 24
-            // Calculate the remaining hours after converting total hours into full days
-            hours = totalHours % 24
-            // Add given uptime in this format (% days, % hours)
-            fUptime = string(totalDays) + " days, " + hours + " hours"
-
+            // Get calculated uptimeInfo
+            fUptime = calcUptime(uptimeInfo)
+            
             // Return uptime
             return fUptime
         }
@@ -440,5 +429,20 @@ class SysInfo {
 
         // Return blockDevices
         return blockDevices
+    }
+
+    // Function to calculate uptime based on uptimeInfo
+    func calcUptime(uptimeInfo) {
+        // Calculate total hours from uptimeInfo
+        totalHours = uptimeInfo / 60 / 60
+        // Calculate total days by dividing total hours by 24
+        totalDays = totalHours / 24
+        // Calculate the remaining hours after converting total hours into full days
+        hours = totalHours % 24
+        // Add given uptime in this format (% days, % hours)
+        fUptime = string(totalDays) + " days, " + hours + " hours"
+
+        // Return uptime
+        return fUptime
     }
 }
