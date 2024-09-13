@@ -429,7 +429,7 @@ class SysInfo {
         }
     }
 
-    // Function to get Storage Info
+    // Function to get Storage Info (For Unix-like OSes)
     func storageInfo() {
         // Execute command to get storage info
         storageInfo = SystemCmd("lsblk --json")
