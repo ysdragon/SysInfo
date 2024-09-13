@@ -252,7 +252,7 @@ class SysInfo {
         if(isWindows()) {
             // Get storage disks (name, size) from winSysInfo
             storageDisks = winSysInfo[:disks]
-            
+
             // Return storage disks
             return storageDisks
         else // Else (If the OS is (Unix-like))
@@ -402,6 +402,19 @@ class SysInfo {
         return pCount
     }
 
+    // Function to get Storage Info (For Unix-like OSes)
+    func storageInfo() {
+        // Execute command to get storage info
+        storageInfo = SystemCmd("lsblk --json")
+        // Convert json to list
+        storageInfo = json2List(storageInfo)
+        // Get blockdevices from StorageInfo
+        blockDevices = storageInfo[:blockdevices]
+
+        // Return blockDevices
+        return blockDevices
+    }
+
     // Function to get OS id (For Unix-like OS only)
     func osID() {
         // If the OS is not Windows (Unix-like)
@@ -416,19 +429,6 @@ class SysInfo {
             // Return the OS ID
             return osId
         }
-    }
-
-    // Function to get Storage Info (For Unix-like OSes)
-    func storageInfo() {
-        // Execute command to get storage info
-        storageInfo = SystemCmd("lsblk --json")
-        // Convert json to list
-        storageInfo = json2List(storageInfo)
-        // Get blockdevices from StorageInfo
-        blockDevices = storageInfo[:blockdevices]
-
-        // Return blockDevices
-        return blockDevices
     }
 
     // Function to calculate uptime based on uptimeInfo
