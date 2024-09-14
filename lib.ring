@@ -10,14 +10,20 @@ class SysInfo {
     
     // Check if the Operating System is Windows
     if(isWindows()) {
-        // Write the PowerShell script (PS_SCRIPT) content to winSysInfo.ps1
-        write("winSysInfo.ps1", PS_SCRIPT)
-        // Execute winSysInfo.ps1 script
-        cmd = SystemCmd("powershell -NoProfile -ExecutionPolicy Bypass -File ./winSysInfo.ps1")
-        // Convert returned json to list
+        // Create a temporary PowerShell script file in the %TEMP% directory
+        psTempScript = tempname() + ".ps1"
+        // Open the file for writing
+        fp = fopen(psTempScript, "w")
+        // Write the content of PS_SCRIPT to the temp PowerShell file
+        fwrite(fp, PS_SCRIPT)
+        // Close the file stream
+        fclose(fp)
+        // Execute the temp PowerShell script
+        cmd = SystemCmd("powershell -NoProfile -ExecutionPolicy Bypass -File " + psTempScript)
+        // Convert the returned JSON to a list
         winSysInfo = json2List(cmd)
-        // Remove winSysInfo.ps1 script
-        remove("winSysInfo.ps1")
+        // Delete the temp PowerShell script
+        OSDeleteFile(psTempScript)
     }
 
     // Function to get the hostname
