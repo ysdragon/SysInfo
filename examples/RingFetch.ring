@@ -35,7 +35,7 @@ ramUsed = sys.ram()[:used]
 // Get RAM free
 ramFree = sys.ram()[:free]
 // Get System Uptime
-uptime = sys.uptime()
+uptime = sys.sysUptime()
 // Get Packages count for Unix-like OSes or Program Count for Windows
 pcount = sys.pCount()
 // Get currently mounted storage parts

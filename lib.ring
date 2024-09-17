@@ -362,7 +362,7 @@ class SysInfo {
     }
 
     // Function to get uptime
-    func uptime() {
+    func sysUptime() {
         // Check if the OS is Windows
         if(isWindows()) {
             // Get uptime from winSysInfo
