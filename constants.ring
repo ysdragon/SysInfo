@@ -26,7 +26,6 @@ $RAM = @{
     used = $USED_RAM.ToString() + 'G'
     free = $FREE_RAM.ToString() + 'G'
 }
-$BOOT = (Get-CimInstance -Query 'SELECT LastBootUpTime FROM Win32_OperatingSystem')
 $DISKS_RAW = Get-CimInstance -Query 'SELECT Size, DeviceID, Model FROM Win32_DiskDrive'
 $DISKS = @()
 foreach ($DISK in $DISKS_RAW) {
@@ -51,7 +50,6 @@ $Result = @{
     cpu = $CPU
     gpu = $GPUs
     ram = $RAM
-    uptime = ((Get-Date) - $BOOT.LastBootUpTime).TotalSeconds
     os = $OS.Caption
     version = $OS.Version
     disks = $DISKS

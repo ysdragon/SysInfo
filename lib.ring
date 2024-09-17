@@ -362,29 +362,12 @@ class SysInfo {
     }
 
     // Function to get uptime
-    func sysUptime() {
-        // Check if the OS is Windows
-        if(isWindows()) {
-            // Get uptime from winSysInfo
-            uptimeInfo = winSysInfo[:uptime]
-            // Get calculated uptimeInfo
-            fUptime = calcUptime(uptimeInfo)
-            
-            // Return uptime
-            return fUptime
-        else // Else (If the OS is (Unix-like))
-            // Execute command to get uptime
-            uptimeInfo = SystemCmd("cat /proc/uptime")
-            // Split the output
-            uptimeInfo = split(uptimeInfo, " ")
-            // Get uptime
-            uptimeInfo = uptimeInfo[1]
-            // Get calculated uptimeInfo
-            fUptime = calcUptime(uptimeInfo)
-            
-            // Return uptime
-            return fUptime
-        }
+    func sysUptime(params) {
+        // Get calculated uptimeInfo
+        fUptime = calcUptime(uptime(), params)
+
+        // Return uptime
+        return fUptime
     }
 
     // Function to get System Architecture
@@ -420,6 +403,46 @@ class SysInfo {
         return pCount
     }
 
+    // Function to calculate uptime based on uptimeInfo and the given params list
+    func calcUptime(uptimeInfo, params) {
+        // Set default parameter values if not provided, not a list, or the list is empty
+        if !isList(params) or len(params) = 0 {
+            params = [:days = 1, :hours = 1, :minutes = 1, :seconds = 1]
+        }
+        
+        // Convert uptimeInfo from 0.1 ms to seconds
+        totalSeconds = floor(uptimeInfo / 10000000)
+
+        # Define time units
+        tUnits = [
+            [86400, "day", :days],
+            [3600, "hour", :hours],
+            [60, "minute", :minutes],
+            [1, "second", :seconds]
+        ]
+
+        # Format the uptime string
+        fUptime = ""
+        for tUnit in tUnits {
+            if params[tUnit[3]] = 1 {
+                value = floor(totalSeconds / tUnit[1])
+                if value > 0 or len(fUptime) > 0 {
+                    if len(fUptime) > 0 {
+                        fUptime += ", "
+                    }
+                    fUptime += string(value) + " " + tUnit[2]
+                    if value != 1 {
+                        fUptime += "s"
+                    }
+                    totalSeconds = totalSeconds % tUnit[1]
+                }
+            }
+        }
+
+        # Return uptime
+        return fUptime
+    }
+
     // Function to get Storage Info (For Unix-like OSes)
     func storageInfo() {
         // Execute command to get storage info
@@ -447,20 +470,5 @@ class SysInfo {
             // Return the OS ID
             return osId
         }
-    }
-
-    // Function to calculate uptime based on uptimeInfo
-    func calcUptime(uptimeInfo) {
-        // Calculate total hours from uptimeInfo
-        totalHours = uptimeInfo / 60 / 60
-        // Calculate total days by dividing total hours by 24
-        totalDays = totalHours / 24
-        // Calculate the remaining hours after converting total hours into full days
-        hours = totalHours % 24
-        // Add given uptime in this format (% days, % hours)
-        fUptime = string(totalDays) + " days, " + hours + " hours"
-
-        // Return uptime
-        return fUptime
     }
 }
