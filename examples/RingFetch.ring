@@ -34,8 +34,18 @@ ramSize = sys.ram()[:size]
 ramUsed = sys.ram()[:used]
 // Get RAM free
 ramFree = sys.ram()[:free]
-// Get System Uptime
-uptime = sys.sysUptime()
+/*  Get System Uptime
+Examples:
+uptime = sys.sysUptime([]) // ---> (% days, % hours, % minutes, % seconds)
+uptime = sys.sysUptime([:days = 1, :hours = 1, :minutes = 1, :seconds = 1]) //  ---> (% days, % hours, % minutes, % seconds)
+uptime = sys.sysUptime([:days = 1, :hours = 1, :minutes = 1]) // ---> (% days, % hours, % minutes)
+uptime = sys.sysUptime([:days = 1, :hours = 1]) // ---> (% days, % hours)
+uptime = sys.sysUptime([:days = 1, :minutes = 1]) // ---> (% days, % minutes)
+uptime = sys.sysUptime([:days = 1]) // ---> (% days)
+uptime = sys.sysUptime([:minutes = 1]) // ---> (% minutes)
+uptime = sys.sysUptime([:hours = 1]) // ---> (% hours)
+*/
+uptime = sys.sysUptime([])
 // Get Packages count for Unix-like OSes or Program Count for Windows
 pcount = sys.pCount()
 // Get currently mounted storage parts
