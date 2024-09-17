@@ -169,17 +169,29 @@ class SysInfo {
             return gpuName
         else // Else (If the OS is (Unix-like))
             try {
+                // Check if pciutils is installed
+                result = SystemCmd("which lspci")
+                if isNull(result) {
+                    return "Please install pciutils"
+                }
+
                 // Execute command to get GPU name
                 gpuInfo = SystemCmd("lspci -d *::0300 -mm")
-                // Split the text by "
+
+                // Check if no GPU detected
+                if isNull(gpuInfo) {
+                    return "No GPU detected"
+                }
+
+                // Split the output by "
                 gpuName = split(gpuInfo, '" ')
                 // Remove any double-quotes
                 gpuName = substr(gpuName[3], '"', "")
 
                 // Return GPU name
                 return  gpuName
-            catch // If pciutils not installed
-                return "Please install pciutils"
+            catch // If an error occurred
+                return "An error occurred while fetching GPU information"
             }
         }
     }
