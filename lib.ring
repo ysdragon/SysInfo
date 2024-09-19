@@ -413,14 +413,6 @@ class SysInfo {
         // Convert uptimeInfo from 0.1 ms to seconds
         totalSeconds = floor(uptimeInfo / 10000000)
 
-        // Define time units
-        tUnits = [
-            [86400, "day", :days],
-            [3600, "hour", :hours],
-            [60, "minute", :minutes],
-            [1, "second", :seconds]
-        ]
-
         // Format the uptime string
         fUptime = ""
         for tUnit in tUnits {
