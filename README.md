@@ -11,29 +11,31 @@
 - Retrieve essential system information, including hostname, operating system, RAM, disks, parts, and more.
 - etc?
 
-## How to install?
-#### Using Ring Package Manager **`ringpm`**
+## Installation
+#### Using Ring Package Manager (`ringpm`)
 
-#### From ringpm registry
+#### From the RingPM registry
 ```bash
 ringpm install SysInfo
 ```
 > [!NOTE]  
-> Run `ringpm refresh` first.
+> Run `ringpm refresh` before installing to ensure you have the latest ringpm registry.
 
-#### You can also install it from here
+#### From here (this repo)
 ```bash
 ringpm install SysInfo from ysdragon 
 ```
 > [!NOTE]  
-> If you want to update to a new version run `ringpm update SysInfo`.
+> To update to the latest version, run `ringpm update SysInfo`.
 
 ## Example
-#### A Complete good example called ***RingFetch*** is available [Here](https://github.com/ysdragon/SysInfo/tree/main/examples)
+#### A complete example, ***RingFetch***, can be found [here](https://github.com/ysdragon/SysInfo/tree/main/examples).
 
-## Operating Systems Tested
-- Linux Distributions: Void Linux, Ubuntu, Debian, Arch Linux, and Fedora.
-- Windows Versions: Windows 10 and Windows 11.
+## Supported Operating Systems
+- Linux: Void Linux, Ubuntu, Debian, Arch Linux, and Fedora.
+- Windows: Windows 10 and Windows 11.
+> [!NOTE]  
+> This package has not been tested on macOS.
 
 ## Contributing
 Public contributions are welcome!  
