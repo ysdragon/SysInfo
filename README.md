@@ -32,8 +32,9 @@ ringpm install SysInfo from ysdragon
 #### A complete example, ***RingFetch***, can be found [here](https://github.com/ysdragon/SysInfo/tree/main/examples).
 
 ## Supported Operating Systems
-- Linux: Void Linux, Ubuntu, Debian, Arch Linux, and Fedora.
+- Linux: Void Linux, Ubuntu, Debian, Arch Linux, and Fedora, etc.
 - Windows: Windows 10 and Windows 11.
+
 > [!NOTE]  
 > This package has not been tested on macOS.
 
