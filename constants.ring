@@ -40,7 +40,7 @@ foreach ($PART in $PARTS_RAW) {
     $PARTS += @{
         name = $PART.Caption
         size = [math]::round($PART.Size / 1GB, 2).ToString() + 'G'
-        used = [math]::round($PART.Size / 1GB, 2) - [math]::round($Disk.FreeSpace / 1GB, 2)
+        used = ([math]::round($PART.Size / 1GB, 2) - [math]::round($PART.FreeSpace / 1GB, 2)).ToString() + 'G'
         free = [math]::round($PART.FreeSpace / 1GB, 2).ToString() + 'G'
     }
 }
