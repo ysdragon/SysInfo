@@ -14,8 +14,12 @@ hostname = sys.hostname()
 username = sys.username()
 // Get Shell
 shell = sys.shell()
-// Get OS
-os = sys.os()
+/* Get OS info
+Examples:
+osName = sys.os()[:name] // ---> Get OS name
+osID = sys.os()[:id] // ---> Get OS id
+*/
+osName = sys.os()[:name]
 // Get System Architecture
 arch = sys.arch()
 // Get Kernel Version
@@ -57,12 +61,12 @@ disks = sys.storageDisks()
 
 print("
     **                     RingFetch                     **
-    ** Author: ysdragon (https://github.com/ysdragon)    **
+    **   Author: ysdragon (https://github.com/ysdragon)  **
 
     Hostname: #{hostname}
     Username: #{username}
     Shell: #{shell}
-    OS: #{os}
+    OS: #{osName}
     Arch: #{arch}
     Kernel: #{version}
     Packages: #{pcount}

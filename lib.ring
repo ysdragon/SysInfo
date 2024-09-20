@@ -36,8 +36,12 @@ class SysInfo {
             // Return hostname
             return hostname
         else // Else (If the OS is (Unix-like))
-            // Execute command to get hostname
-            hostname = SystemCmd("cat /proc/sys/kernel/hostname")
+            // Open and get the hostname
+            hostname = readFile("/proc/sys/kernel/hostname")
+            // Convert the string to list
+            hostname = str2list(hostname)
+            // Get the hostname
+            hostname = hostname[1]
 
             // Return hostname
             return hostname
@@ -49,98 +53,39 @@ class SysInfo {
         // Check if the OS is Windows
         if (isWindows()) {
             // Get the USERNAME environment variable
-            return sysget("USERNAME")
+
+            return SysGet("USERNAME")
         else // Else (If the OS is (Unix-like))
+
             // Get the USER environment variable
-            return sysget("USER")
+            return SysGet("USER")
         }
     }
 
     // Function to get OS name
     func os() {
-        // Check if the OS is Windows
-        if(isWindows()) {
-            // Get os from winSysInfo List
-            osName = winSysInfo[:os]    
+        // Get osInfo
+        osInfo = osInfo()
 
-            // Return os name         
-            return osName
-        else // Else (If the OS is (Unix-like))
-            // Execute command to get OS name
-            osInfo = SystemCmd("cat /etc/os-release | grep ^PRETTY_NAME=")
-            // Split the returned text from osInfo
-            osName = split(osInfo, "=")
-            // Get OS name without double-quotes
-            osName = substr(osName[2], '"', "")
-
-            // Return the OS name
-            return osName
-        }
+        // Return the OS info
+        return osInfo
     }
 
     // Function to get the Kernel version
     func version() {
-        // Check if the OS is Windows
-        if(isWindows()) {
-            // Get Windows NT Kernel version from winSysInfo
-            kVersion = winSysInfo[:version]
+        // Get the Kernel version from kernelInfo
+        kVersion = kernelInfo()
 
-            // Return Windows NT Kernel version
-            return kVersion
-        else // Else (If the OS is (Unix-like))
-            // Execute command to get Kernel from Unix-Like OSes
-            kVersion = SystemCmd("uname -r")
-
-            // Return Kernel
-            return kVersion
-        }
+        // Return the Kernel version
+        return kVersion
     }
 
-    // Function to get CPU Name, Cores and Threads
+    // Function to get CPU name, cores and threads
     func cpu() {
-        // Check if the OS is Windows
-        if(isWindows()) {
-            // Get CPU info from winSysInfo list
-            cpuInfo = winSysInfo[:cpu]
+        cpuInfo = cpuInfo()          
 
-            // Return CPU info
-            return cpuInfo
-        else // Else (If the OS is (Unix-like))
-            // Execute command to get CPU info
-            cpuInfo = SystemCmd("cat /proc/cpuinfo")
-            // Split cpuInfo into lines
-            cpuInfo = split(cpuInfo, "\n")
-
-            // Split to get CPU name
-            cpuName = split(cpuInfo[5], ":")
-            // Get CPU Name
-            cpuName = cpuName[2]
-            // Trim all left spaces
-            cpuName = trimLeft(cpuName)
-
-            // Split to get CPU cores
-            cpuCores = split(cpuInfo[13], ":")
-            // Get CPU cores
-            cpuCores = cpuCores[2]
-            // Trim all left spaces
-            cpuCores = trimLeft(cpuCores)
-            
-            // Execute command to get CPU threads
-            cpuThreads = SystemCmd("cat /proc/cpuinfo | grep -c '^processor'")
-
-            // Initialize cpuInfo list
-            cpuInfo = []
-
-            // Add name to cpuInfo
-            cpuInfo[:name] = cpuName
-            // Add cores to cpuInfo
-            cpuInfo[:cores] = cpuCores
-            // Add threads to cpuInfo
-            cpuInfo[:threads] = cpuThreads
-            
-            // Return cpuInfo
-            return cpuInfo
-        }
+        // Return cpuInfo
+        return cpuInfo
     }
 
     // Function to get GPU name
@@ -150,7 +95,7 @@ class SysInfo {
             // Get GPU info from winSysInfo list
             gpuInfo = winSysInfo[:gpu]
 
-            // Initialize gpuName
+            // Initialize the gpuName var
             gpuName = ""
 
             // Check if the length of gpuInfo greater than 1
@@ -206,8 +151,8 @@ class SysInfo {
             // Return Shell name
             return shellName
         else // Else (If the OS is (Unix-like))
-            // Execute command to get currently running shell
-            ShellInfo = SystemCmd("env | grep '^SHELL=' | cut -d= -f2")
+            // Get currently running shell from the system environment
+            ShellInfo = SysGet("SHELL")
             // Get shell name only from its path e.g. /usr/bin/fish --> fish
             shellName = JustFileName(ShellInfo)
 
@@ -218,39 +163,25 @@ class SysInfo {
     }
     
     func ram() {
+        // Initialize the ramInfo list
+        ramInfo = []
+
         // Check if the OS is Windows
         if(isWindows()) {
             // Get Ram info (size, used, free) from winSysInfo
-            ramInfo = winSysInfo[:ram]
+            ramInfo = memoryInfo()
 
             // Return Ram info
             return ramInfo
         else // Else (If the OS is (Unix-like))
-            // Initialize ramInfo
-            ramInfo = []
-            
-            // Execute command to get Ram info
-            memInfo = SystemCmd("grep -E 'MemTotal|MemAvailable' /proc/meminfo")
-            // Split memInfo into lines
-            memInfo = split(memInfo, "\n")
+            // Get ramInfo from memoryInfo
+            ramInfo = memoryInfo()
+        
+            // Get totalRam and convert the value from KB to GB
+            totalRam = ramInfo[:MemTotal][1] / 1024 / 1024
 
-            // Split to get total ram size
-            totalRam = split(memInfo[1], ":")
-            // Trim spaces
-            totalRam = trim(totalRam[2])
-            // Remove kB
-            totalRam = substr(totalRam, "kB", "")
-            // Convert from kB to GB
-            totalRam = totalRam / 1024 / 1024
-
-            // Split to get free ram
-            freeRam = split(memInfo[2], ":")
-            // Trim spaces
-            freeRam = trim(freeRam[2])
-            // Remove kB
-            freeRam = substr(freeRam, "kB", "")
-            // Convert from kB to GB
-            freeRam = freeRam / 1024 / 1024
+            // Get freeRam and convert the value from KB to GB
+            freeRam = ramInfo[:MemAvailable][1] / 1024 / 1024
             
             // Add size to ramInfo
             ramInfo[:size] = totalRam
@@ -266,6 +197,11 @@ class SysInfo {
 
     // Function to get storage disks info
     func storageDisks() {
+        // Initialize the blockDevices list
+        blockDevices = []
+        // Initialize the StorageDisks list
+        storageDisks = []
+
         // Check if the OS is Windows
         if(isWindows()) {
             // Get storage disks (name, size) from winSysInfo
@@ -277,9 +213,6 @@ class SysInfo {
             // Get blockdevices from StorageInfo
             blockDevices = storageInfo()
             
-            // Initialize StorageDisks
-            storageDisks = []
-
             // Loop in every blockdevice in blockDevices
             for blockDevice in blockDevices {
                 // Add blockDevice name and size to StorageDisks
@@ -292,7 +225,12 @@ class SysInfo {
     }
 
     // Function to get storage parts info
-    func storageParts() {
+    func storageParts() { 
+        // Initialize the blockDevices list
+        blockDevices = []
+        // Initialize the storageParts list
+        storageParts = []
+
         // Check if the OS is Windows
         if(isWindows()) {
             // Get storage parts from winSysInfo (name, size, used, free)
@@ -303,9 +241,6 @@ class SysInfo {
         else // Else (If the OS is (Unix-like))
             // Get blockdevices from StorageInfo
             blockDevices = storageInfo()
-            
-            // Initialize storageParts
-            storageParts = []
 
             // Loop every blockDevice in blockDevices
             for blockDevice in blockDevices {
@@ -381,19 +316,21 @@ class SysInfo {
 
     // Function to get Package/Program count
     func pCount() {
+        // Default pCount value
+        pCount = "Unknown"
+
         // Check if the OS is Windows
         if(isWindows()) {
+            // Get installed programs count from winSysInfo
             pCount = winSysInfo[:pcount]
 
+            // Return programs count
             return pCount
         else // Else (If the OS is (Unix-like))
-            // Default pCount value
-            pCount = "Unknown" // Unknown when your OS is not supported
-
-            // Loop in every package manager
+            // Loop through every package manager
             for pManager in pManagers {
                 // If your OS is supported get pCount
-                if(find(pManager[2][:supported], osID())) {
+                if(find(pManager[2][:supported], osInfo()[:id])) {
                     pCount = SystemCmd(pManager[2][:cmd]) + " (" + pManager[2][:name] + ")"                    
                 }
             }
@@ -401,6 +338,201 @@ class SysInfo {
 
         // Return package count
         return pCount
+    }
+
+    // function to get osInfo
+    func osInfo() {
+        // Initialize the osInfo list
+        osInfo = []
+
+        // OS name default value
+        osInfo[:name] = "Unknown"
+        // OS id default value
+        osInfo[:id] = "unknown"
+
+        // Check if the OS is Windows
+        if(isWindows()) {
+            // Get the OS name from winSysInfo List
+            osInfo[:name] = winSysInfo[:os]    
+            // Set the OS id to windows
+            osInfo[:id] = "windows"
+
+            // Return the osInfo        
+            return osInfo
+        else // Else (If the OS is (Unix-like))
+            // Read /etc/os-release content
+            content = readFile("/etc/os-release")
+            // Remove any double-quoets
+            content = substr(content, '"', '')
+
+            // Convert the content string lines into a list 
+            lines = str2list(content)
+            // Loop through every line
+            for line in lines {
+                // Check if PRETTY_NAME= exists
+                if(substr(line, 1, 12) = "PRETTY_NAME=") {
+                
+                    // Return the OS name
+                    osInfo[:name] = substr(line, 13)
+                    
+                // Check if ID= exists
+                elseif(substr(line, 1, 3) = "ID=")
+                
+                    // Return the OS ID
+                    osInfo[:id] = substr(line, 4)
+                }
+            }
+
+            // Return the osInfo list
+            return osInfo 
+        }
+    }
+
+    // Function to get Kernel info
+    func kernelInfo() {
+        // kVersion default value
+        kVersion = "Unknown"
+
+        // Check if the OS is Windows
+        if(isWindows()) {
+            // Get Windows NT Kernel version from winSysInfo
+            kVersion = winSysInfo[:version]
+
+            // Return Windows NT Kernel version
+            return kVersion
+        else // Else (If the OS is (Unix-like))
+            // Read and get the Kernel info from /proc/version
+            kInfo = readFile("/proc/version")
+            
+            // Check if version exists
+            vStartIndex = substr(kInfo, "version ")
+            // if version exists, return the kernel version only
+            if(vStartIndex > 0) {
+                vStartIndex += 8
+                vSubstring = substr(kInfo, vStartIndex, len(kInfo) - vStartIndex + 1)
+                vEndIndex = substr(vSubstring, " ")
+                if(vEndIndex > 0) {
+                    kVersion = left(vSubstring, vEndIndex - 1)
+
+                    // Return the Kernel version
+                    return kVersion
+                }
+            }
+        }
+    }
+
+    // Function to get CPU info
+    func cpuInfo() {
+        // Initialize the cpuInfo list
+        cpuInfo = []
+
+        // Check if the OS is Windows
+        if(isWindows()) {
+            // Get CPU info from the winSysInfo list
+            cpuInfo = winSysInfo[:cpu]
+
+            // Return CPU info
+            return cpuInfo
+        else // Else (If the OS is (Unix-like))
+            // CPU name default value
+            cpuInfo[:name] = "Unknown"
+            // CPU cores default value
+            cpuInfo[:cores] = "0"
+            // CPU threads default value
+            cpuInfo[:threads] = "0"
+
+            // Read and get cpuinfo content
+            content = readFile("/proc/cpuinfo")
+
+            // Convert the content string lines into a list  
+            lines = str2list(content)
+
+            // processorCount default value
+            processorCount = 0
+            // coreCount default value
+            coreCount = 0
+            
+            // Loop through every line
+            for line in lines {
+                // Check if the model name string exists
+                if(substr(line, "model name") = 1) {
+                    // Find the position of the colon
+                    colonPos = substr(line, ":")
+                    if(colonPos > 0) {
+                        cpuInfo[:name] = trim(substr(line, colonPos + 1))
+                    }
+
+                // Check if the processor string exists
+                elseif(substr(line, "processor") = 1)
+                    processorCount++
+
+                // Check if the cpu cores string exists
+                elseif(substr(line, "cpu cores") = 1)
+                    // Find the position of the colon
+                    colonPos = substr(line, ":")
+                    if(colonPos > 0) {
+                        coreCount = number(trim(substr(line, colonPos + 1)))
+                    }
+                }
+            }
+
+            // Set processorCount to threads
+            cpuInfo[:threads] = string(processorCount)
+            
+            // If coreCount greater than 0, set the coreCount to :cores 
+            if(coreCount > 0) {
+                cpuInfo[:cores] = string(coreCount)
+            else // Else (if the coreCount is equal to 0, set threads to :cores)
+                cpuInfo[:cores] = cpuInfo[:threads]
+            }
+
+            // Return the cpuInfo list
+            return cpuInfo
+        }
+    }
+
+    // Function to get Memory info
+    func memoryInfo() {
+        // Initialize the memInfo list
+        memInfo = []
+        
+        // Check if the OS is Windows
+        if(isWindows()) {
+            // Get Ram info (size, used, free) from winSysInfo
+            memInfo = winSysInfo[:ram]
+
+            // Return Ram info
+            return memInfo
+        else // Else (If the OS is (Unix-like))
+            // Read and get meminfo 
+            content = readFile("/proc/meminfo")
+
+            // Convert the content string lines into a list  
+            lines = str2list(content)
+
+            // Loop through every line  
+            for line in lines {
+                // Find the position of the colon
+                colonPos = substr(line, ":")
+                if(colonPos > 0) {
+                    key = trim(left(line, colonPos - 1))
+                    valueStr = trim(right(line, len(line) - colonPos))
+            
+                    // Split the value string into value
+                    spacePos = substr(valueStr, " ")
+                    if(spacePos > 0) {
+                        value = number(left(valueStr, spacePos - 1))
+                    else
+                        value = number(valueStr)
+                    }
+                        
+                    memInfo[key] = [value]
+                }
+            }
+
+            // Return the memInfo list
+            return memInfo
+        }
     }
 
     // Function to calculate uptime based on uptimeInfo and the given params list
@@ -448,19 +580,18 @@ class SysInfo {
         return blockDevices
     }
 
-    // Function to get OS id (For Unix-like OS only)
-    func osID() {
-        // If the OS is not Windows (Unix-like)
-        if(!isWindows()) { 
-            // Execute command to get OS ID
-            osInfo = SystemCmd("cat /etc/os-release | grep ^ID=")
-            // Split the returned text from osInfo
-            osId = split(osInfo, "=")
-            // Get OS name without double-quotes
-            osId = substr(osId[2], '"', "")
+    // Function to read the contents of a file
+    func readFile(file) {
+        // Open the specified file in read-only mode
+        fp = fopen(file, "r")
+        
+        // Read up to 4096 bytes from the file
+        result = fread(fp, 4096)
+        
+        // Close the file stream
+        fclose(fp)
 
-            // Return the OS ID
-            return osId
-        }
+        // Return the contents from the file
+        return result
     }
 }
