@@ -3,7 +3,7 @@
 
   <p>A package to retrieve essential system information for Ring</p>
 
-  [![Ring](https://img.shields.io/badge/Made%20with-Ring-2D54CB)](https://github.com/ring-lang/ring)
+  [![Ring](https://img.shields.io/badge/Made%20with-Ring-2D54CB)](https://ring-lang.net/)
 </div>
 
 ## Features
