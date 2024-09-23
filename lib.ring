@@ -440,6 +440,10 @@ class SysInfo {
             cpuInfo[:cores] = "0"
             // CPU threads default value
             cpuInfo[:threads] = "0"
+            // CPU usage default value
+            cpuInfo[:usage] = NULL
+            // CPU temp default value 
+            cpuInfo[:temp] = NULL
 
             // Read and get cpuinfo content
             content = readFile("/proc/cpuinfo")
@@ -485,6 +489,33 @@ class SysInfo {
             else // Else (if the coreCount is equal to 0, set threads to :cores)
                 cpuInfo[:cores] = cpuInfo[:threads]
             }
+
+            // Get initial CPU stats (CPU load)
+            initialStats = split(substr(split(readFile("/proc/stat"), nl)[1], 6), " ")
+            
+            // Sleep for 0.05 seconds (to update the CPU stats)
+            sleep(0.05)
+
+            // Get updated CPU stats after the sleep period (CPU load)
+            updatedStats = split(substr(split(readFile("/proc/stat"), nl)[1], 6), " ")
+
+            // Initialize diffs list
+            diffs = []
+
+            // Calculate the diffs between updated and initial stats
+            for i = 1 to len(initialStats)
+                // Subtract initial value from updated value and add the diff to the diffs list
+                add(diffs, updatedStats[i] - initialStats[i])
+            next
+
+            // Get calculated CPU usage
+            cpuInfo[:usage] = 100 * (sumlist(diffs) - diffs[4]) / sumlist(diffs)
+
+            // Get CPU temp
+            cpuTemp = number(readFile("/sys/class/thermal/thermal_zone0/temp"))
+            
+            // Convert CPU temp from millidegrees to degrees
+            cpuInfo[:temp]  = cpuTemp / 1000
 
             // Return the cpuInfo list
             return cpuInfo

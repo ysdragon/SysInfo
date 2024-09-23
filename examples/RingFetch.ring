@@ -30,6 +30,14 @@ cpuName = sys.cpu()[:name]
 cpuCores = sys.cpu()[:cores]
 // Get CPU threads
 cpuThreads = sys.cpu()[:threads]
+// Get CPU usage
+cpuUsage = string(sys.cpu()[:usage]) + "%"
+// Get CPU temp (Currently for Unix-like OSes only)
+if(isUnix()) {
+    cpuTemp = ", Temp " + sys.cpu()[:temp] + "°"
+else
+    cpuTemp = NULL
+}
 // Get GPU name
 gpu = sys.gpu()
 // Get RAM size
@@ -70,7 +78,7 @@ print("
     Arch: #{arch}
     Kernel: #{version}
     Packages: #{pcount}
-    CPU: #{cpuName} Cores: #{cpuCores} Threads: #{cpuThreads}
+    CPU: #{cpuName} Cores: #{cpuCores}, Threads: #{cpuThreads}, Usage: #{cpuUsage}#{cpuTemp}
     GPU: #{gpu}
     RAM: Size: #{ramSize}, Used: #{ramUsed}, Free: #{ramFree}
     Uptime: #{uptime}
