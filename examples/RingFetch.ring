@@ -14,6 +14,9 @@ hostname = sys.hostname()
 username = sys.username()
 // Get Shell
 shell = sys.shell()
+/* Get currently running terminal (For Unix-like OSes only)
+term = sys.term()
+*/
 /* Get OS info
 Examples:
 osName = sys.os()[:name] // ---> Get OS name

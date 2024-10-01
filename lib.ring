@@ -39,7 +39,7 @@ class SysInfo {
             // Open and get the hostname
             hostname = readFile("/proc/sys/kernel/hostname")
             // Convert the string to list
-            hostname = str2list(hostname)
+            hostname = str2List(hostname)
             // Get the hostname
             hostname = hostname[1]
 
@@ -82,6 +82,7 @@ class SysInfo {
 
     // Function to get CPU name, cores and threads
     func cpu() {
+        // Get CPU info from cpuInfo
         cpuInfo = cpuInfo()          
 
         // Return cpuInfo
@@ -160,6 +161,22 @@ class SysInfo {
             return shellName
         }
         
+    }
+
+    // Function to get currently running terminal info (For Unix-like OSes)
+    func term() {
+        // Check if the OS is Unix-like
+        if(isUnix()) {
+            // Get currently running terminal from the TERM_PROGRAM env var
+            termName = SysGet("TERM_PROGRAM")
+            // Get currently running terminal version from the TERM_PROGRAM_VERSION env var
+            termVersion = SysGet("TERM_PROGRAM_VERSION")
+            // Combine termName and termVersion
+            term = termName + " " + termVersion
+
+            // Return terminal info
+            return term
+        }
     }
     
     func ram() {
@@ -366,7 +383,7 @@ class SysInfo {
             content = substr(content, '"', '')
 
             // Convert the content string lines into a list 
-            lines = str2list(content)
+            lines = str2List(content)
             // Loop through every line
             for line in lines {
                 // Check if PRETTY_NAME= exists
@@ -449,7 +466,7 @@ class SysInfo {
             content = readFile("/proc/cpuinfo")
 
             // Convert the content string lines into a list  
-            lines = str2list(content)
+            lines = str2List(content)
 
             // processorCount default value
             processorCount = 0
@@ -539,7 +556,7 @@ class SysInfo {
             content = readFile("/proc/meminfo")
 
             // Convert the content string lines into a list  
-            lines = str2list(content)
+            lines = str2List(content)
 
             // Loop through every line  
             for line in lines {
