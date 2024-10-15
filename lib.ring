@@ -528,11 +528,18 @@ class SysInfo {
             // Get calculated CPU usage
             cpuInfo[:usage] = 100 * (sumlist(diffs) - diffs[4]) / sumlist(diffs)
 
-            // Get CPU temp
-            cpuTemp = number(readFile("/sys/class/thermal/thermal_zone0/temp"))
+            // tempFile value
+            tempFile = "/sys/class/thermal/thermal_zone0/temp"
             
-            // Convert CPU temp from millidegrees to degrees
-            cpuInfo[:temp]  = cpuTemp / 1000
+            // Check if tempFile exists (because VMs don't have this file)
+            if(fexists(tempFile)) {
+                // Get CPU temp
+                cpuTemp = number(readFile(tempFile))
+                // Convert CPU temp from millidegrees to degrees
+                cpuInfo[:temp]  = cpuTemp / 1000
+            else // If tempFile doesn't exist
+                cpuInfo[:temp] = null
+            }
 
             // Return the cpuInfo list
             return cpuInfo
