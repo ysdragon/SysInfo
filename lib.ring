@@ -9,7 +9,7 @@ load "constants.ring"
 class SysInfo {
     
     // Check if the Operating System is Windows
-    if(isWindows()) {
+    if (isWindows()) {
         // Create a temporary PowerShell script file in the %TEMP% directory
         psTempScript = tempname() + ".ps1"
         // Open the file for writing
@@ -29,7 +29,7 @@ class SysInfo {
     // Function to get the hostname
     func hostname() {
         // Check if the Operating System is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Execute command to get hostname
             hostname = SystemCmd("hostname")
             
@@ -92,7 +92,7 @@ class SysInfo {
     // Function to get GPU name
     func gpu() {
         // Check if the OS is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Get GPU info from winSysInfo list
             gpuInfo = winSysInfo[:gpu]
 
@@ -100,12 +100,12 @@ class SysInfo {
             gpuName = ""
 
             // Check if the length of gpuInfo greater than 1
-            if(len(gpuInfo) > 1) {
+            if (len(gpuInfo) > 1) {
                 // Loop in every GPU
                 for i=1 to len(gpuInfo) {
                     gpuName += "GPU" + i + ": " + gpuInfo[i][:name] + " "
                 }
-            elseif(len(gpuInfo) = 1) // If there's only one GPU return its model name
+            elseif (len(gpuInfo) = 1) // If there's only one GPU return its model name
                 gpuName = gpuInfo[1][:name]
             else  // If there's no GPU detected
                 gpuName = "No GPU detected!"
@@ -117,7 +117,7 @@ class SysInfo {
             try {
                 // Check if pciutils is installed
                 result = SystemCmd("which lspci")
-                if isNull(result) {
+                if (isNull(result)) {
                     return "Please install pciutils"
                 }
 
@@ -125,7 +125,7 @@ class SysInfo {
                 gpuInfo = SystemCmd("lspci -d *::0300 -mm")
 
                 // Check if no GPU detected
-                if isNull(gpuInfo) {
+                if (isNull(gpuInfo)) {
                     return "No GPU detected"
                 }
 
@@ -145,7 +145,7 @@ class SysInfo {
     // Function to get currently running shell
     func shell() {
         // Check if the OS is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Get currently running shell name from winSysInfo
             shellName = winSysInfo[:shell]
 
@@ -166,7 +166,7 @@ class SysInfo {
     // Function to get currently running terminal info (For Unix-like OSes)
     func term() {
         // Check if the OS is Unix-like
-        if(isUnix()) {
+        if (isUnix()) {
             // Get currently running terminal from the TERM_PROGRAM env var
             termName = SysGet("TERM_PROGRAM")
             // Get currently running terminal version from the TERM_PROGRAM_VERSION env var
@@ -184,7 +184,7 @@ class SysInfo {
         ramInfo = []
 
         // Check if the OS is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Get Ram info (size, used, free) from winSysInfo
             ramInfo = memoryInfo()
 
@@ -220,7 +220,7 @@ class SysInfo {
         storageDisks = []
 
         // Check if the OS is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Get storage disks (name, size) from winSysInfo
             storageDisks = winSysInfo[:disks]
 
@@ -249,7 +249,7 @@ class SysInfo {
         storageParts = []
 
         // Check if the OS is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Get storage parts from winSysInfo (name, size, used, free)
             storageParts = winSysInfo[:parts]
 
@@ -281,7 +281,7 @@ class SysInfo {
                         if (isValidMountPoint) {
                             try {
                                 // Execute command to get specific children (part) (name, size, used, free)
-                                childrenInfo = SystemCmd("df -h --output=source,size,used,avail | grep '" + children[:name] + "' | sed -E 's/[[:space:]]+/-/g; s/(.*):/\1:/' | sed 's/$/-/'")
+                                childrenInfo = SystemCmd("df -h | grep '" + children[:name] + "' | awk '{print $1, $2, $3, $4}' | sed -E 's/[[:space:]]+/-/g; s/(.*):/\1:/' | sed 's/$/-/'")
                                 // Split the output
                                 childrenInfo = split(childrenInfo, "-")
                                 
@@ -337,7 +337,7 @@ class SysInfo {
         pCount = "Unknown"
 
         // Check if the OS is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Get installed programs count from winSysInfo
             pCount = winSysInfo[:pcount]
 
@@ -347,7 +347,7 @@ class SysInfo {
             // Loop through every package manager
             for pManager in pManagers {
                 // If your OS is supported get pCount
-                if(find(pManager[2][:supported], osInfo()[:id])) {
+                if (find(pManager[2][:supported], osInfo()[:id])) {
                     pCount = SystemCmd(pManager[2][:cmd]) + " (" + pManager[2][:name] + ")"                    
                 }
             }
@@ -368,7 +368,7 @@ class SysInfo {
         osInfo[:id] = "unknown"
 
         // Check if the OS is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Get the OS name from winSysInfo List
             osInfo[:name] = winSysInfo[:os]    
             // Set the OS id to windows
@@ -387,13 +387,13 @@ class SysInfo {
             // Loop through every line
             for line in lines {
                 // Check if PRETTY_NAME= exists
-                if(substr(line, 1, 12) = "PRETTY_NAME=") {
+                if (substr(line, 1, 12) = "PRETTY_NAME=") {
                 
                     // Return the OS name
                     osInfo[:name] = substr(line, 13)
                     
                 // Check if ID= exists
-                elseif(substr(line, 1, 3) = "ID=")
+                elseif (substr(line, 1, 3) = "ID=")
                 
                     // Return the OS ID
                     osInfo[:id] = substr(line, 4)
@@ -411,7 +411,7 @@ class SysInfo {
         kVersion = "Unknown"
 
         // Check if the OS is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Get Windows NT Kernel version from winSysInfo
             kVersion = winSysInfo[:version]
 
@@ -424,11 +424,11 @@ class SysInfo {
             // Check if version exists
             vStartIndex = substr(kInfo, "version ")
             // if version exists, return the kernel version only
-            if(vStartIndex > 0) {
+            if (vStartIndex > 0) {
                 vStartIndex += 8
                 vSubstring = substr(kInfo, vStartIndex, len(kInfo) - vStartIndex + 1)
                 vEndIndex = substr(vSubstring, " ")
-                if(vEndIndex > 0) {
+                if (vEndIndex > 0) {
                     kVersion = left(vSubstring, vEndIndex - 1)
 
                     // Return the Kernel version
@@ -444,7 +444,7 @@ class SysInfo {
         cpuInfo = []
 
         // Check if the OS is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Get CPU info from the winSysInfo list
             cpuInfo = winSysInfo[:cpu]
 
@@ -476,22 +476,22 @@ class SysInfo {
             // Loop through every line
             for line in lines {
                 // Check if the model name string exists
-                if(substr(line, "model name") = 1) {
+                if (substr(line, "model name") = 1) {
                     // Find the position of the colon
                     colonPos = substr(line, ":")
-                    if(colonPos > 0) {
+                    if (colonPos > 0) {
                         cpuInfo[:name] = trim(substr(line, colonPos + 1))
                     }
 
                 // Check if the processor string exists
-                elseif(substr(line, "processor") = 1)
+                elseif (substr(line, "processor") = 1)
                     processorCount++
 
                 // Check if the cpu cores string exists
-                elseif(substr(line, "cpu cores") = 1)
+                elseif (substr(line, "cpu cores") = 1)
                     // Find the position of the colon
                     colonPos = substr(line, ":")
-                    if(colonPos > 0) {
+                    if (colonPos > 0) {
                         coreCount = number(trim(substr(line, colonPos + 1)))
                     }
                 }
@@ -501,7 +501,7 @@ class SysInfo {
             cpuInfo[:threads] = string(processorCount)
             
             // If coreCount greater than 0, set the coreCount to :cores 
-            if(coreCount > 0) {
+            if (coreCount > 0) {
                 cpuInfo[:cores] = string(coreCount)
             else // Else (if the coreCount is equal to 0, set threads to :cores)
                 cpuInfo[:cores] = cpuInfo[:threads]
@@ -532,7 +532,7 @@ class SysInfo {
             tempFile = "/sys/class/thermal/thermal_zone0/temp"
             
             // Check if tempFile exists (because VMs don't have this file)
-            if(fexists(tempFile)) {
+            if (fexists(tempFile)) {
                 // Get CPU temp
                 cpuTemp = number(readFile(tempFile))
                 // Convert CPU temp from millidegrees to degrees
@@ -552,7 +552,7 @@ class SysInfo {
         memInfo = []
         
         // Check if the OS is Windows
-        if(isWindows()) {
+        if (isWindows()) {
             // Get Ram info (size, used, free) from winSysInfo
             memInfo = winSysInfo[:ram]
 
@@ -569,13 +569,13 @@ class SysInfo {
             for line in lines {
                 // Find the position of the colon
                 colonPos = substr(line, ":")
-                if(colonPos > 0) {
+                if (colonPos > 0) {
                     key = trim(left(line, colonPos - 1))
                     valueStr = trim(right(line, len(line) - colonPos))
             
                     // Split the value string into value
                     spacePos = substr(valueStr, " ")
-                    if(spacePos > 0) {
+                    if (spacePos > 0) {
                         value = number(left(valueStr, spacePos - 1))
                     else
                         value = number(valueStr)
@@ -593,7 +593,7 @@ class SysInfo {
     // Function to calculate uptime based on uptimeInfo and the given params list
     func calcUptime(uptimeInfo, params) {
         // Set default parameter values if not provided, not a list, or the list is empty
-        if !isList(params) or len(params) = 0 {
+        if (!isList(params) or len(params) = 0) {
             params = [:days = 1, :hours = 1, :minutes = 1, :seconds = 1]
         }
         
@@ -603,14 +603,14 @@ class SysInfo {
         // Format the uptime string
         fUptime = ""
         for tUnit in tUnits {
-            if params[tUnit[3]] = 1 {
+            if (params[tUnit[3]] = 1) {
                 value = floor(totalSeconds / tUnit[1])
-                if value > 0 or len(fUptime) > 0 {
-                    if len(fUptime) > 0 {
+                if (value > 0 or len(fUptime) > 0) {
+                    if (len(fUptime) > 0) {
                         fUptime += ", "
                     }
                     fUptime += string(value) + " " + tUnit[2]
-                    if value != 1 {
+                    if (value != 1) {
                         fUptime += "s"
                     }
                     totalSeconds = totalSeconds % tUnit[1]
