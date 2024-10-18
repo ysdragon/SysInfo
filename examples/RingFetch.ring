@@ -69,6 +69,9 @@ parts = sys.storageParts()
 // Get storage disks
 // Storage disks has (name, size)
 disks = sys.storageDisks()
+/* Method to check if the machine is a VM (Currently for Unix-like OSes only)
+isVM = sys.isVM() // ---> true if it's a VM, false if it is not
+*/
 
 print("
     **                     RingFetch                     **

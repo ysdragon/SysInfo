@@ -634,6 +634,32 @@ class SysInfo {
         // Return blockDevices
         return blockDevices
     }
+    
+    // Function to check if the machine is a VM (Currently for Unix-like OSes only)
+    func isVM() {
+        if (isUnix()) {
+            // Get cpuInfo from /proc/cpuinfo
+            cpuInfo = readFile("/proc/cpuinfo")
+            
+            // List of virtualization indicators to check
+            virtIndicators = ["hypervisor", "kvm", "vmware", "vbox", "xen"]
+
+            // Loop through virtIndicators list
+            for virt in virtIndicators {
+
+                // Determine if it's a VM
+                if (substr(cpuInfo, virt)) {
+                    
+                    // Return true if the machine is a VM
+                    return true
+                }
+
+            }
+                
+            // If no indicators are found, return false
+            return false
+        }
+    }
 
     private
 
@@ -641,10 +667,8 @@ class SysInfo {
     func readFile(file) {
         // Open the specified file in read-only mode
         fp = fopen(file, "r")
-        
         // Read up to 4096 bytes from the file
         result = fread(fp, 4096)
-        
         // Close the file stream
         fclose(fp)
 
