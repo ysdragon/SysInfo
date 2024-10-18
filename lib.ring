@@ -635,6 +635,8 @@ class SysInfo {
         return blockDevices
     }
 
+    private
+
     // Function to read the contents of a file
     func readFile(file) {
         // Open the specified file in read-only mode
