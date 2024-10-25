@@ -3,8 +3,7 @@
 */
 
 // PowerShell Script for Windows
-PS_SCRIPT = "
-$CPU_INFO = (Get-CimInstance -Query 'SELECT Name, NumberOfCores, NumberOfLogicalProcessors FROM Win32_Processor')
+PS_SCRIPT = `$CPU_INFO = (Get-CimInstance -Query 'SELECT Name, NumberOfCores, NumberOfLogicalProcessors FROM Win32_Processor')
 $CPU_USAGE = (Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 1 -MaxSamples 1).CounterSamples.CookedValue
 $CPU = @{
     name = $CPU_INFO.Name
@@ -48,6 +47,7 @@ foreach ($PART in $PARTS_RAW) {
 }
 $PCOUNT = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\* | Measure-Object).Count
 $SHELL = 'PowerShell ' + $PSVersionTable.PSVersion.ToString()
+$isVM = (Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer -match 'Microsoft Corporation|VMware|Xen|KVM|VirtualBox|QEMU'
 $Result = @{
     cpu = $CPU
     gpu = $GPUs
@@ -58,9 +58,9 @@ $Result = @{
     parts = $PARTS
     pcount = $PCOUNT
     shell = $SHELL
+    isVM = $isVM
 }
-Write-Output (ConvertTo-Json $Result)
-"
+Write-Output (ConvertTo-Json $Result)`
 
 // Time units
 tUnits = [

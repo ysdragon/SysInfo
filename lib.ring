@@ -8,7 +8,7 @@ load "constants.ring"
 
 class SysInfo {
     
-    // Check if the Operating System is Windows
+    // Check if the OS is Windows
     if (isWindows()) {
         // Create a temporary PowerShell script file in the %TEMP% directory
         psTempScript = tempname() + ".ps1"
@@ -31,7 +31,7 @@ class SysInfo {
         // Initialize hostname
         hostname = "Unknown"
 
-        // Check if the Operating System is Windows
+        // Check if the OS is Windows
         if (isWindows()) {
             // Execute command to get hostname
             hostname = systemCmd("hostname")
@@ -256,7 +256,7 @@ class SysInfo {
             for blockDevice in blockDevices {
                 // Loop every children in blockDevice (disk part)
                 for children in blockDevice[:children] {
-                    # Check if mountpoint is not null
+                    // Check if mountpoint is not null
                     if (!isnull(children[:mountpoint])) {
                         // Get partition info
                         childrenInfo = systemCmd("df -h | grep '" + children[:name] + "' | awk '{print $1, $2, $3, $4}'")
@@ -361,13 +361,13 @@ class SysInfo {
                 // Check if PRETTY_NAME= exists
                 if (substr(line, 1, 12) = "PRETTY_NAME=") {
                 
-                    // Return the OS name
+                    // Get the OS name
                     osInfo[:name] = substr(line, 13)
                     
                 // Check if ID= exists
                 elseif (substr(line, 1, 3) = "ID=")
                 
-                    // Return the OS ID
+                    // Get the OS ID
                     osInfo[:id] = substr(line, 4)
                 }
             }
@@ -512,9 +512,15 @@ class SysInfo {
         return cpuInfo
     }
     
-    // Function to check if the machine is a VM (Currently for Unix-like OSes only)
+    // Function to check if the machine is a VM
     func isVM() {
-        if (isUnix()) {
+        // Initialize isVM
+        isVM = NULL
+
+        // Check if the OS is Windows
+        if (isWindows()) {
+            isVM = winSysInfo[:isVM]
+        else // Else (If the OS is (Unix-like))
             // Get cpuInfo from /proc/cpuinfo
             cpuInfo = readFile("/proc/cpuinfo")
             
@@ -528,14 +534,17 @@ class SysInfo {
                 if (substr(cpuInfo, virt)) {
                     
                     // Return true if the machine is a VM
-                    return true
+                    isVM = true
                 }
 
             }
                 
             // If no indicators are found, return false
-            return false
+            isVM = false
         }
+
+        // Return isVM
+        return isVM
     }
 
     private
@@ -616,6 +625,7 @@ class SysInfo {
 
     // Function to get Storage Info (For Unix-like OSes)
     func storageInfo() {
+        // Initialize the blockDevices list
         blockDevices = []
         
         try {
