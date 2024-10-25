@@ -19,7 +19,7 @@ class SysInfo {
         // Close the file stream
         fclose(fp)
         // Execute the temp PowerShell script
-        cmd = SystemCmd("powershell -NoProfile -ExecutionPolicy Bypass -File " + psTempScript)
+        cmd = systemCmd("powershell -NoProfile -ExecutionPolicy Bypass -File " + psTempScript)
         // Convert the returned JSON to a list
         winSysInfo = json2List(cmd)
         // Delete the temp PowerShell script
@@ -31,7 +31,7 @@ class SysInfo {
         // Check if the Operating System is Windows
         if (isWindows()) {
             // Execute command to get hostname
-            hostname = SystemCmd("hostname")
+            hostname = systemCmd("hostname")
             
             // Return hostname
             return hostname
@@ -116,13 +116,13 @@ class SysInfo {
         else // Else (If the OS is (Unix-like))
             try {
                 // Check if pciutils is installed
-                result = SystemCmd("which lspci")
+                result = systemCmd("which lspci")
                 if (isNull(result)) {
                     return "Please install pciutils"
                 }
 
                 // Execute command to get GPU name
-                gpuInfo = SystemCmd("lspci -d *::0300 -mm")
+                gpuInfo = systemCmd("lspci -d *::0300 -mm")
 
                 // Check if no GPU detected
                 if (isNull(gpuInfo)) {
@@ -223,9 +223,6 @@ class SysInfo {
         if (isWindows()) {
             // Get storage disks (name, size) from winSysInfo
             storageDisks = winSysInfo[:disks]
-
-            // Return storage disks
-            return storageDisks
         else // Else (If the OS is (Unix-like))
             // Get blockdevices from StorageInfo
             blockDevices = storageInfo()
@@ -235,10 +232,10 @@ class SysInfo {
                 // Add blockDevice name and size to StorageDisks
                 add(storageDisks, [:name = blockDevice[:name], :size = blockDevice[:size]])
             }
-            
-            // Return storageDisks
-            return storageDisks
         }
+
+        // Return storage disks
+        return storageDisks
     }
 
     // Function to get storage parts info
@@ -253,8 +250,6 @@ class SysInfo {
             // Get storage parts from winSysInfo (name, size, used, free)
             storageParts = winSysInfo[:parts]
 
-            // Return storageParts
-            return storageParts
         else // Else (If the OS is (Unix-like))
             // Get blockdevices from StorageInfo
             blockDevices = storageInfo()
@@ -263,54 +258,39 @@ class SysInfo {
             for blockDevice in blockDevices {
                 // Loop every children in blockDevice (disk part)
                 for children in blockDevice[:children] {
-                    // Check if mountpoints is not null or empty
-                    if (children[:mountpoints] != NULL and len(children[:mountpoints]) > 0) {
-                        // Initialize isValidMountPoint
-                        isValidMountPoint = false
-                        
-                        // Loop every mountpoint in children (disk part)
-                        for mountpoint in children[:mountpoints] {
-                            // Check if mountpoint value is not "null"
-                            if (mountpoint != "null") {
-                                isValidMountPoint = true
-                                break
-                            }
-                        }
+                    # Check if mountpoint is not null
+                    if (!isnull(children[:mountpoint])) {
+                        // Get partition info
+                        childrenInfo = systemCmd("df -h | grep '" + children[:name] + "' | awk '{print $1, $2, $3, $4}'")
+                        // Split the output into lines
+                        childrenInfo = split(childrenInfo, nl)
 
-                        // Execute the command if a valid mountpoint was found
-                        if (isValidMountPoint) {
-                            try {
-                                // Execute command to get specific children (part) (name, size, used, free)
-                                childrenInfo = SystemCmd("df -h | grep '" + children[:name] + "' | awk '{print $1, $2, $3, $4}' | sed -E 's/[[:space:]]+/-/g; s/(.*):/\1:/' | sed 's/$/-/'")
+                        // Loop through partition info
+                        for info in childrenInfo {
+                            if (!isnull(info)) {
                                 // Split the output
-                                childrenInfo = split(childrenInfo, "-")
-                                
-                                // Ensure we have enough list items
-                                if (len(childrenInfo) = 4) {
-                                    // Get childrenName (part name)
-                                    childrenName = childrenInfo[1]
-                                    // Get childrenSize (part size)
-                                    childrenSize = childrenInfo[2]
-                                    // Get childrenUsed (part used size)
-                                    childrenUsed = childrenInfo[3]
-                                    // Get childrenFree (part free size)
-                                    childrenFree = childrenInfo[4]
+                                childrenInfoList = split(info, " ")
 
-                                    // Add children (part) to StorageParts
-                                    add(storageParts, [:name = childrenName, :size = childrenSize, :used = childrenUsed, :free = childrenFree])
-                                }
-                            catch 
-                                // Handle the error
-                                ? "Error: " + cCatchError
+                                // Get childrenName (part name)
+                                childrenName = childrenInfoList[1]
+                                // Get childrenSize (part size)
+                                childrenSize = childrenInfoList[2]
+                                // Get childrenUsed (part used size)
+                                childrenUsed = childrenInfoList[3]
+                                // Get childrenFree (part free size)
+                                childrenFree = childrenInfoList[4]
+
+                                // Add children (part) to StorageParts
+                                add(storageParts, [:name = childrenName, :size = childrenSize, :used = childrenUsed, :free = childrenFree])
                             }
                         }
                     }
                 }
             }
-
-            // Return storageParts
-            return storageParts
         }
+
+        // Return storageParts
+        return storageParts
     }
 
     // Function to get uptime
@@ -348,7 +328,7 @@ class SysInfo {
             for pManager in pManagers {
                 // If your OS is supported get pCount
                 if (find(pManager[2][:supported], osInfo()[:id])) {
-                    pCount = SystemCmd(pManager[2][:cmd]) + " (" + pManager[2][:name] + ")"                    
+                    pCount = systemCmd(pManager[2][:cmd]) + " (" + pManager[2][:name] + ")"                    
                 }
             }
         }
@@ -652,12 +632,21 @@ class SysInfo {
 
     // Function to get Storage Info (For Unix-like OSes)
     func storageInfo() {
-        // Execute command to get storage info
-        storageInfo = SystemCmd("lsblk --json")
-        // Convert json to list
-        storageInfo = json2List(storageInfo)
-        // Get blockdevices from StorageInfo
-        blockDevices = storageInfo[:blockdevices]
+        blockDevices = []
+        
+        try {
+            // Execute command to get storage info
+            storageInfo = systemCmd("lsblk --json -o NAME,SIZE,FSTYPE,MOUNTPOINT")
+            
+            // Convert json to list
+            storageInfo = json2List(storageInfo)
+            
+            // Get blockdevices from StorageInfo
+            blockDevices = storageInfo[:blockdevices]
+        catch
+            // Handle errors
+            ? "Error: " + cCatchError
+        }
 
         // Return blockDevices
         return blockDevices
