@@ -28,13 +28,13 @@ class SysInfo {
 
     // Function to get the hostname
     func hostname() {
+        // Initialize hostname
+        hostname = "Unknown"
+
         // Check if the Operating System is Windows
         if (isWindows()) {
             // Execute command to get hostname
             hostname = systemCmd("hostname")
-            
-            // Return hostname
-            return hostname
         else // Else (If the OS is (Unix-like))
             // Open and get the hostname
             hostname = readFile("/proc/sys/kernel/hostname")
@@ -42,10 +42,10 @@ class SysInfo {
             hostname = str2List(hostname)
             // Get the hostname
             hostname = hostname[1]
-
-            // Return hostname
-            return hostname
         }
+
+        // Return hostname
+        return hostname
     }
 
     // Function to get the username
@@ -91,6 +91,9 @@ class SysInfo {
 
     // Function to get GPU name
     func gpu() {
+        // Initialize gpuName
+        gpuName = "Unknown"
+
         // Check if the OS is Windows
         if (isWindows()) {
             // Get GPU info from winSysInfo list
@@ -110,9 +113,6 @@ class SysInfo {
             else  // If there's no GPU detected
                 gpuName = "No GPU detected!"
             }
-
-            // Return GPU name
-            return gpuName
         else // Else (If the OS is (Unix-like))
             try {
                 // Check if pciutils is installed
@@ -133,38 +133,40 @@ class SysInfo {
                 gpuName = split(gpuInfo, '" ')
                 // Remove any double-quotes
                 gpuName = substr(gpuName[3], '"', "")
-
-                // Return GPU name
-                return  gpuName
             catch // If an error occurred
-                return "An error occurred while fetching GPU information"
+                return "An error occurred while fetching GPU information: " + cCatchError 
             }
         }
+
+        // Return GPU name
+        return  gpuName
     }
 
     // Function to get currently running shell
     func shell() {
+        // Initialize shellName
+        shellName = "Unknown"
+
         // Check if the OS is Windows
         if (isWindows()) {
             // Get currently running shell name from winSysInfo
             shellName = winSysInfo[:shell]
-
-            // Return Shell name
-            return shellName
         else // Else (If the OS is (Unix-like))
             // Get currently running shell from the system environment
             ShellInfo = SysGet("SHELL")
             // Get shell name only from its path e.g. /usr/bin/fish --> fish
             shellName = JustFileName(ShellInfo)
-
-            // Return Shell name
-            return shellName
         }
         
+        // Return Shell name
+        return shellName
     }
 
     // Function to get currently running terminal info (For Unix-like OSes)
     func term() {
+        // Initialize term
+        term = "Unknown"
+
         // Check if the OS is Unix-like
         if (isUnix()) {
             // Get currently running terminal from the TERM_PROGRAM env var
@@ -173,10 +175,10 @@ class SysInfo {
             termVersion = SysGet("TERM_PROGRAM_VERSION")
             // Combine termName and termVersion
             term = termName + " " + termVersion
-
-            // Return terminal info
-            return term
         }
+    
+        // Return terminal info
+        return term
     }
     
     func ram() {
@@ -187,9 +189,6 @@ class SysInfo {
         if (isWindows()) {
             // Get Ram info (size, used, free) from winSysInfo
             ramInfo = memoryInfo()
-
-            // Return Ram info
-            return ramInfo
         else // Else (If the OS is (Unix-like))
             // Get ramInfo from memoryInfo
             ramInfo = memoryInfo()
@@ -206,10 +205,10 @@ class SysInfo {
             ramInfo[:used] = totalRam - freeRam
             // Add free to ramInfo
             ramInfo[:free] = freeRam
-            
-            // Return Ram info
-            return ramInfo
         }
+                
+        // Return Ram info
+        return ramInfo
     }
 
     // Function to get storage disks info
@@ -249,7 +248,6 @@ class SysInfo {
         if (isWindows()) {
             // Get storage parts from winSysInfo (name, size, used, free)
             storageParts = winSysInfo[:parts]
-
         else // Else (If the OS is (Unix-like))
             // Get blockdevices from StorageInfo
             blockDevices = storageInfo()
@@ -320,9 +318,6 @@ class SysInfo {
         if (isWindows()) {
             // Get installed programs count from winSysInfo
             pCount = winSysInfo[:pcount]
-
-            // Return programs count
-            return pCount
         else // Else (If the OS is (Unix-like))
             // Loop through every package manager
             for pManager in pManagers {
@@ -353,9 +348,6 @@ class SysInfo {
             osInfo[:name] = winSysInfo[:os]    
             // Set the OS id to windows
             osInfo[:id] = "windows"
-
-            // Return the osInfo        
-            return osInfo
         else // Else (If the OS is (Unix-like))
             // Read /etc/os-release content
             content = readFile("/etc/os-release")
@@ -379,10 +371,10 @@ class SysInfo {
                     osInfo[:id] = substr(line, 4)
                 }
             }
-
-            // Return the osInfo list
-            return osInfo 
         }
+
+        // Return the osInfo        
+        return osInfo
     }
 
     // Function to get Kernel info
@@ -394,9 +386,6 @@ class SysInfo {
         if (isWindows()) {
             // Get Windows NT Kernel version from winSysInfo
             kVersion = winSysInfo[:version]
-
-            // Return Windows NT Kernel version
-            return kVersion
         else // Else (If the OS is (Unix-like))
             // Read and get the Kernel info from /proc/version
             kInfo = readFile("/proc/version")
@@ -410,12 +399,12 @@ class SysInfo {
                 vEndIndex = substr(vSubstring, " ")
                 if (vEndIndex > 0) {
                     kVersion = left(vSubstring, vEndIndex - 1)
-
-                    // Return the Kernel version
-                    return kVersion
                 }
             }
         }
+
+        // Return Windows NT Kernel version
+        return kVersion
     }
 
     // Function to get CPU info
@@ -427,16 +416,13 @@ class SysInfo {
         if (isWindows()) {
             // Get CPU info from the winSysInfo list
             cpuInfo = winSysInfo[:cpu]
-
-            // Return CPU info
-            return cpuInfo
         else // Else (If the OS is (Unix-like))
             // CPU name default value
             cpuInfo[:name] = "Unknown"
             // CPU cores default value
-            cpuInfo[:cores] = "0"
+            cpuInfo[:cores] = 0
             // CPU threads default value
-            cpuInfo[:threads] = "0"
+            cpuInfo[:threads] = 0
             // CPU usage default value
             cpuInfo[:usage] = NULL
             // CPU temp default value 
@@ -520,10 +506,10 @@ class SysInfo {
             else // If tempFile doesn't exist
                 cpuInfo[:temp] = null
             }
-
-            // Return the cpuInfo list
-            return cpuInfo
         }
+
+        // Return CPU info
+        return cpuInfo
     }
     
     // Function to check if the machine is a VM (Currently for Unix-like OSes only)
@@ -563,9 +549,6 @@ class SysInfo {
         if (isWindows()) {
             // Get Ram info (size, used, free) from winSysInfo
             memInfo = winSysInfo[:ram]
-
-            // Return Ram info
-            return memInfo
         else // Else (If the OS is (Unix-like))
             // Read and get meminfo 
             content = readFile("/proc/meminfo")
@@ -592,10 +575,11 @@ class SysInfo {
                     memInfo[key] = [value]
                 }
             }
-
-            // Return the memInfo list
-            return memInfo
         }
+
+    
+        // Return Ram info
+        return memInfo
     }
     
     // Function to calculate uptime based on uptimeInfo and the given params list
