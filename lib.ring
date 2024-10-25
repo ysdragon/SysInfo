@@ -589,6 +589,34 @@ class SysInfo {
             return memInfo
         }
     }
+    
+    // Function to check if the machine is a VM (Currently for Unix-like OSes only)
+    func isVM() {
+        if (isUnix()) {
+            // Get cpuInfo from /proc/cpuinfo
+            cpuInfo = readFile("/proc/cpuinfo")
+            
+            // List of virtualization indicators to check
+            virtIndicators = ["hypervisor", "kvm", "vmware", "vbox", "xen"]
+
+            // Loop through virtIndicators list
+            for virt in virtIndicators {
+
+                // Determine if it's a VM
+                if (substr(cpuInfo, virt)) {
+                    
+                    // Return true if the machine is a VM
+                    return true
+                }
+
+            }
+                
+            // If no indicators are found, return false
+            return false
+        }
+    }
+
+    private
 
     // Function to calculate uptime based on uptimeInfo and the given params list
     func calcUptime(uptimeInfo, params) {
@@ -622,34 +650,6 @@ class SysInfo {
         return fUptime
     }
     
-    // Function to check if the machine is a VM (Currently for Unix-like OSes only)
-    func isVM() {
-        if (isUnix()) {
-            // Get cpuInfo from /proc/cpuinfo
-            cpuInfo = readFile("/proc/cpuinfo")
-            
-            // List of virtualization indicators to check
-            virtIndicators = ["hypervisor", "kvm", "vmware", "vbox", "xen"]
-
-            // Loop through virtIndicators list
-            for virt in virtIndicators {
-
-                // Determine if it's a VM
-                if (substr(cpuInfo, virt)) {
-                    
-                    // Return true if the machine is a VM
-                    return true
-                }
-
-            }
-                
-            // If no indicators are found, return false
-            return false
-        }
-    }
-
-    private
-
     // Function to get Storage Info (For Unix-like OSes)
     func storageInfo() {
         // Execute command to get storage info
@@ -662,7 +662,7 @@ class SysInfo {
         // Return blockDevices
         return blockDevices
     }
-    
+
     // Function to read the contents of a file
     func readFile(file) {
         // Open the specified file in read-only mode
