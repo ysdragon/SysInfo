@@ -525,22 +525,16 @@ class SysInfo {
             cpuInfo = readFile("/proc/cpuinfo")
             
             // List of virtualization indicators to check
-            virtIndicators = ["hypervisor", "kvm", "vmware", "vbox", "xen"]
+            virtIndicators = ["hypervisor", "kvm", "vmware", "vbox", "xen", "qemu", "docker"]
 
             // Loop through virtIndicators list
             for virt in virtIndicators {
-
                 // Determine if it's a VM
-                if (substr(cpuInfo, virt)) {
-                    
+                if (substr(cpuInfo, virt)) {  
                     // Return true if the machine is a VM
                     isVM = true
                 }
-
             }
-                
-            // If no indicators are found, return false
-            isVM = false
         }
 
         // Return isVM
