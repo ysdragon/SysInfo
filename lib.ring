@@ -621,19 +621,6 @@ class SysInfo {
         // Return uptime
         return fUptime
     }
-
-    // Function to get Storage Info (For Unix-like OSes)
-    func storageInfo() {
-        // Execute command to get storage info
-        storageInfo = SystemCmd("lsblk --json")
-        // Convert json to list
-        storageInfo = json2List(storageInfo)
-        // Get blockdevices from StorageInfo
-        blockDevices = storageInfo[:blockdevices]
-
-        // Return blockDevices
-        return blockDevices
-    }
     
     // Function to check if the machine is a VM (Currently for Unix-like OSes only)
     func isVM() {
@@ -663,6 +650,19 @@ class SysInfo {
 
     private
 
+    // Function to get Storage Info (For Unix-like OSes)
+    func storageInfo() {
+        // Execute command to get storage info
+        storageInfo = SystemCmd("lsblk --json")
+        // Convert json to list
+        storageInfo = json2List(storageInfo)
+        // Get blockdevices from StorageInfo
+        blockDevices = storageInfo[:blockdevices]
+
+        // Return blockDevices
+        return blockDevices
+    }
+    
     // Function to read the contents of a file
     func readFile(file) {
         // Open the specified file in read-only mode
