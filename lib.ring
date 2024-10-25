@@ -545,6 +545,34 @@ class SysInfo {
             return cpuInfo
         }
     }
+    
+    // Function to check if the machine is a VM (Currently for Unix-like OSes only)
+    func isVM() {
+        if (isUnix()) {
+            // Get cpuInfo from /proc/cpuinfo
+            cpuInfo = readFile("/proc/cpuinfo")
+            
+            // List of virtualization indicators to check
+            virtIndicators = ["hypervisor", "kvm", "vmware", "vbox", "xen"]
+
+            // Loop through virtIndicators list
+            for virt in virtIndicators {
+
+                // Determine if it's a VM
+                if (substr(cpuInfo, virt)) {
+                    
+                    // Return true if the machine is a VM
+                    return true
+                }
+
+            }
+                
+            // If no indicators are found, return false
+            return false
+        }
+    }
+
+    private
 
     // Function to get Memory info
     func memoryInfo() {
@@ -590,34 +618,6 @@ class SysInfo {
         }
     }
     
-    // Function to check if the machine is a VM (Currently for Unix-like OSes only)
-    func isVM() {
-        if (isUnix()) {
-            // Get cpuInfo from /proc/cpuinfo
-            cpuInfo = readFile("/proc/cpuinfo")
-            
-            // List of virtualization indicators to check
-            virtIndicators = ["hypervisor", "kvm", "vmware", "vbox", "xen"]
-
-            // Loop through virtIndicators list
-            for virt in virtIndicators {
-
-                // Determine if it's a VM
-                if (substr(cpuInfo, virt)) {
-                    
-                    // Return true if the machine is a VM
-                    return true
-                }
-
-            }
-                
-            // If no indicators are found, return false
-            return false
-        }
-    }
-
-    private
-
     // Function to calculate uptime based on uptimeInfo and the given params list
     func calcUptime(uptimeInfo, params) {
         // Set default parameter values if not provided, not a list, or the list is empty
@@ -649,7 +649,7 @@ class SysInfo {
         // Return uptime
         return fUptime
     }
-    
+
     // Function to get Storage Info (For Unix-like OSes)
     func storageInfo() {
         // Execute command to get storage info
