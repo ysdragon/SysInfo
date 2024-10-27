@@ -331,8 +331,39 @@ class SysInfo {
         // Return package count
         return pCount
     }
+    
+    // Function to check if the machine is a VM
+    func isVM() {
+        // Initialize isVM
+        isVM = NULL
 
-    // function to get osInfo
+        // Check if the OS is Windows
+        if (isWindows()) {
+            isVM = winSysInfo[:isVM]
+        else // Else (If the OS is (Unix-like))
+            // Get cpuInfo from /proc/cpuinfo
+            cpuInfo = readFile("/proc/cpuinfo")
+            
+            // List of virtualization indicators to check
+            virtIndicators = ["hypervisor", "kvm", "vmware", "vbox", "xen", "qemu", "docker"]
+
+            // Loop through virtIndicators list
+            for virt in virtIndicators {
+                // Determine if it's a VM
+                if (substr(cpuInfo, virt)) {  
+                    // Return true if the machine is a VM
+                    isVM = true
+                }
+            }
+        }
+
+        // Return isVM
+        return isVM
+    }
+
+    private
+
+    // Function to get osInfo
     func osInfo() {
         // Initialize the osInfo list
         osInfo = []
@@ -524,37 +555,6 @@ class SysInfo {
         // Return CPU info
         return cpuInfo
     }
-    
-    // Function to check if the machine is a VM
-    func isVM() {
-        // Initialize isVM
-        isVM = NULL
-
-        // Check if the OS is Windows
-        if (isWindows()) {
-            isVM = winSysInfo[:isVM]
-        else // Else (If the OS is (Unix-like))
-            // Get cpuInfo from /proc/cpuinfo
-            cpuInfo = readFile("/proc/cpuinfo")
-            
-            // List of virtualization indicators to check
-            virtIndicators = ["hypervisor", "kvm", "vmware", "vbox", "xen", "qemu", "docker"]
-
-            // Loop through virtIndicators list
-            for virt in virtIndicators {
-                // Determine if it's a VM
-                if (substr(cpuInfo, virt)) {  
-                    // Return true if the machine is a VM
-                    isVM = true
-                }
-            }
-        }
-
-        // Return isVM
-        return isVM
-    }
-
-    private
 
     // Function to get Memory info
     func memoryInfo() {
