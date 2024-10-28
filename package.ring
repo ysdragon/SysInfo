@@ -25,6 +25,7 @@ aPackageInfo = [
 		"main.ring",
 		"constants.ring",
 		"examples/RingFetch.ring",
+		"tests/SysInfo_test.ring",
 		"LICENSE",
 		"README.md"
 	],
