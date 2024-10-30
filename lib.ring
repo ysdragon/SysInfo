@@ -257,7 +257,7 @@ class SysInfo {
                 // Loop every children in blockDevice (disk part)
                 for children in blockDevice[:children] {
                     // Check if mountpoint is not null
-                    if (!isnull(children[:mountpoint])) {
+                    if (!isNull(children[:mountpoint])) {
                         // Get partition info
                         childrenInfo = systemCmd("df -h | grep '" + children[:name] + "' | awk '{print $1, $2, $3, $4}'")
                         // Split the output into lines
@@ -265,7 +265,7 @@ class SysInfo {
 
                         // Loop through partition info
                         for info in childrenInfo {
-                            if (!isnull(info)) {
+                            if (!isNull(info)) {
                                 // Split the output
                                 childrenInfoList = split(info, " ")
 
