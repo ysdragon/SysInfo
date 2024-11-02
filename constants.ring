@@ -81,5 +81,6 @@ pManagers = [
     :xbps = [:supported = ["void", "gabee", "gabeeos", "agarim", "agarimos"], :cmd = "xbps-query -l | wc -l", :name = "xbps"],
     :nix_env = [:supported = ["nix"], :cmd = "nix-store -q --requisites /run/current-system/sw | wc -l", :name = "nix_env"],
     :apk = [:supported = ["alpine", "chimera"], :cmd = "apk list --installed | wc -l", :name = "apk"],
-    :slackpkg = [:supported = ["slackware", "porteus", "porteux", "absolute"], :cmd = "ls /var/log/packages | wc -l", :name = "slackpkg"]
+    :slackpkg = [:supported = ["slackware", "porteus", "porteux", "absolute"], :cmd = "ls /var/log/packages | wc -l", :name = "slackpkg"],
+    :brew = [:supported = ["any"], :cmd = "brew list --cellar | wc -l", :name = "brew"]
 ]
