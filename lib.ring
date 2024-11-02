@@ -28,22 +28,9 @@ class SysInfo {
 
     // Function to get the hostname
     func hostname() {
-        // Initialize hostname
-        hostname = "Unknown"
-
-        // Check if the OS is Windows
-        if (isWindows()) {
-            // Execute command to get hostname
-            hostname = systemCmd("hostname")
-        else // Else (If the OS is (Unix-like))
-            // Open and get the hostname
-            hostname = readFile("/proc/sys/kernel/hostname")
-            // Convert the string to list
-            hostname = str2List(hostname)
-            // Get the hostname
-            hostname = hostname[1]
-        }
-
+        // Execute command to get hostname
+        hostname = systemCmd("hostname")
+    
         // Return hostname
         return hostname
     }
