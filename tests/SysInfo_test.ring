@@ -91,8 +91,9 @@ class SysInfoTest {
     func testShell() {
         ? "Testing shell()..."
         shell = sysInfo.shell()
-        assert(!isNull(shell), "Shell info should not be null")
-        assert(len(shell) > 0, "Shell info should not be empty")
+        assert(isList(shell), "Shell info should be a list")
+        assert(!isNull(shell[:name]), "Shell name should not be null")
+        assert(!isNull(shell[:version]), "Shell version should not be null")
     }
 
     func testTerm() {
