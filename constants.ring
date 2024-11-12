@@ -46,7 +46,12 @@ foreach ($PART in $PARTS_RAW) {
     }
 }
 $PCOUNT = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\* | Measure-Object).Count
-$SHELL = 'PowerShell ' + $PSVersionTable.PSVersion.ToString()
+$SHELL_NAME = 'PowerShell'
+$SHELL_VERSION = $PSVersionTable.PSVersion.ToString()
+$SHELL = @{
+    name = $SHELL_NAME
+    version = $SHELL_VERSION
+}
 $isVM = (Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer -match 'Microsoft Corporation|VMware|Xen|KVM|VirtualBox|QEMU'
 $Result = @{
     cpu = $CPU
