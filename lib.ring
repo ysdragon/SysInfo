@@ -148,35 +148,35 @@ class SysInfo {
             // Get shell name only from its path e.g. /usr/bin/fish --> fish
             shell[:name] = JustFileName(ShellInfo)
             // Execute the shell with the version argument to retrieve the shell version
-            ShellVersion = systemCmd(ShellInfo + " --version")
+            shellVersion = systemCmd(ShellInfo + " --version")
 
             // Switch statement to determine the shell type and extract its version
             switch shell[:name] {
                 case "bash"
-                    // Find the position of the version number in the ShellVersion string
-                    versionPos = substr(ShellVersion, "version ") + len("version ")
-                    // Extract the version number from the ShellVersion string
-                    shell[:version] = substr(ShellVersion, versionPos, substr(ShellVersion, "(") - versionPos)
+                    // Find the position of the version number in the shellVersion string
+                    versionPos = substr(shellVersion, "version ") + len("version ")
+                    // Extract the version number from the shellVersion string
+                    shell[:version] = substr(shellVersion, versionPos, substr(shellVersion, "(") - versionPos)
                 case "fish"
-                    // Find the position of the version number in the ShellVersion string
-                    versionPos = substr(ShellVersion, "version ") + len("version ")
-                    // Extract the version number from the ShellVersion string
-                    shell[:version] = substr(ShellVersion, versionPos)
+                    // Find the position of the version number in the shellVersion string
+                    versionPos = substr(shellVersion, "version ") + len("version ")
+                    // Extract the version number from the shellVersion string
+                    shell[:version] = substr(shellVersion, versionPos)
                 case "zsh"
-                    // Find the position of the version number in the ShellVersion string
-                    versionPos = substr(ShellVersion, "zsh ") + len("zsh ")
-                    // Extract the version number from the ShellVersion string
-                    shell[:version] = substr(ShellVersion, versionPos)
+                    // Find the position of the version number in the shellVersion string
+                    versionPos = substr(shellVersion, "zsh ") + len("zsh ")
+                    // Extract the version number from the shellVersion string
+                    shell[:version] = substr(shellVersion, versionPos)
                 case "tcsh"
                     // Find the position of the version number in the ShellVersion string
-                    versionPos = substr(ShellVersion, "tcsh ") + len("tcsh ")
-                    // Extract the version number from the ShellVersion string
-                    shell[:version] = substr(ShellVersion, versionPos, substr(ShellVersion, "(") - versionPos)
+                    versionPos = substr(shellVersion, "tcsh ") + len("tcsh ")
+                    // Extract the version number from the shellVersion string
+                    shell[:version] = substr(shellVersion, versionPos, substr(shellVersion, "(") - versionPos)
                 case "ksh"
-                    // Find the position of the version number in the ShellVersion string
-                    versionPos = substr(ShellVersion, "/") + len("/")
-                    // Extract the version number from the ShellVersion string
-                    shell[:version] = substr(ShellVersion, versionPos)                    
+                    // Find the position of the version number in the shellVersion string
+                    versionPos = substr(shellVersion, "/") + len("/")
+                    // Extract the version number from the shellVersion string
+                    shell[:version] = substr(shellVersion, versionPos)                    
             }
         }
         

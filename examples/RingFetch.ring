@@ -12,8 +12,11 @@ sys = new SysInfo
 hostname = sys.hostname()
 // Get username
 username = sys.username()
-// Get Shell
-shell = sys.shell()
+/* Get Shell
+shellName = sys.shell()[:name] // ---> Get shell name
+shellVersion = sys.shell()[:version] // ---> Get shell version
+*/
+shell = sys.shell()[:name] + " " + sys.shell()[:version]
 /* Get currently running terminal (For Unix-like OSes only)
 term = sys.term()
 */
