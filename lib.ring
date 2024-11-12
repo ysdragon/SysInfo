@@ -131,22 +131,57 @@ class SysInfo {
 
     // Function to get currently running shell
     func shell() {
-        // Initialize shellName
-        shellName = "Unknown"
+        // Initialize the shell list with default values
+        shell = [
+            :name = "Unknown",
+            :version = "Unknown"
+        ]
 
         // Check if the OS is Windows
         if (isWindows()) {
-            // Get currently running shell name from winSysInfo
-            shellName = winSysInfo[:shell]
+            // Get currently running shell name and version from winSysInfo
+            shell = winSysInfo[:shell]
+            
         else // Else (If the OS is (Unix-like))
             // Get currently running shell from the system environment
             ShellInfo = SysGet("SHELL")
             // Get shell name only from its path e.g. /usr/bin/fish --> fish
-            shellName = JustFileName(ShellInfo)
+            shell[:name] = JustFileName(ShellInfo)
+            // Execute the shell with the version argument to retrieve the shell version
+            ShellVersion = systemCmd(ShellInfo + " --version")
+
+            // Switch statement to determine the shell type and extract its version
+            switch shell[:name] {
+                case "bash"
+                    // Find the position of the version number in the ShellVersion string
+                    versionPos = substr(ShellVersion, "version ") + len("version ")
+                    // Extract the version number from the ShellVersion string
+                    shell[:version] = substr(ShellVersion, versionPos, substr(ShellVersion, "(") - versionPos)
+                case "fish"
+                    // Find the position of the version number in the ShellVersion string
+                    versionPos = substr(ShellVersion, "version ") + len("version ")
+                    // Extract the version number from the ShellVersion string
+                    shell[:version] = substr(ShellVersion, versionPos)
+                case "zsh"
+                    // Find the position of the version number in the ShellVersion string
+                    versionPos = substr(ShellVersion, "zsh ") + len("zsh ")
+                    // Extract the version number from the ShellVersion string
+                    shell[:version] = substr(ShellVersion, versionPos)
+                case "tcsh"
+                    // Find the position of the version number in the ShellVersion string
+                    versionPos = substr(ShellVersion, "tcsh ") + len("tcsh ")
+                    // Extract the version number from the ShellVersion string
+                    shell[:version] = substr(ShellVersion, versionPos, substr(ShellVersion, "(") - versionPos)
+                case "ksh"
+                    // Find the position of the version number in the ShellVersion string
+                    versionPos = substr(ShellVersion, "/") + len("/")
+                    // Extract the version number from the ShellVersion string
+                    shell[:version] = substr(ShellVersion, versionPos)                    
+            }
         }
         
-        // Return Shell name
-        return shellName
+        // Return the shell list
+        return shell
     }
 
     // Function to get currently running terminal info (For Unix-like OSes)
