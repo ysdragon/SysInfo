@@ -10,20 +10,15 @@ func main() {
     Example:
         // Load SysInfo Package
         load "SysInfo.ring"
-        // Create a new instance of the SysInfo class
+
+        // Create a new SysInfo instance
         sys = new SysInfo
-        // Get OS name
-        osName = sys.os()
-        // Get CPU name
-        cpuName = sys.cpu()[:name]
-        // Get CPU cores
-        cpuCores = sys.cpu()[:cores]
-        // Get CPU threads
-        cpuThreads = sys.cpu()[:threads]
-        // Print osName
-        ? osName
-        // Print CPU name, cores and threads
-        ? cpuName + " " + cpuCores + " " + cpuThreads
+
+        // Get basic system information
+        ? "OS: " + sys.os()[:name]
+        ? "Hostname: " + sys.hostname()
+        ? "CPU: " + sys.cpu()[:model]
+        ? "Total RAM: " + sys.ram()[:size] + " GB"
 
         // A complete good example can be found in the package's examples folder.
 	\n`)

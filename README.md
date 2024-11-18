@@ -70,7 +70,7 @@ sys = new SysInfo
 // Get basic system information
 ? "OS: " + sys.os()[:name]
 ? "Hostname: " + sys.hostname()
-? "CPU: " + sys.cpu()[:name]
+? "CPU: " + sys.cpu()[:model]
 ? "Total RAM: " + sys.ram()[:size] + " GB"
 ```
 
