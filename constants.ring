@@ -5,10 +5,19 @@
 // PowerShell Script for Windows
 PS_SCRIPT = `$CPU_INFO = (Get-CimInstance -Query 'SELECT Name, NumberOfCores, NumberOfLogicalProcessors FROM Win32_Processor')
 $CPU_USAGE = (Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 1 -MaxSamples 1).CounterSamples.CookedValue
+$CPU_MODELS = @()
+foreach ($CPU in $CPU_INFO) {
+    $CPU_MODEL = $CPU.Name.Trim()
+    $TOTAL_CORES += $CPU.NumberOfCores
+    $TOTAL_THREADS += $CPU.NumberOfLogicalProcessors
+    $CPU_MODELS += $CPU_MODEL
+    $CPU_COUNT++
+}
 $CPU = @{
-    model = $CPU_INFO.Name
-    cores = $CPU_INFO.NumberOfCores
-    threads = $CPU_INFO.NumberOfLogicalProcessors
+    cores = $TOTAL_CORES
+    count = $CPU_COUNT
+    model = [string]::Join(", ", $CPU_MODELS)
+    threads = $TOTAL_THREADS
     usage = [math]::round($CPU_USAGE, 2)
 }
 $GPU_INFO = (Get-CimInstance -Query 'SELECT Caption FROM Win32_VideoController')
