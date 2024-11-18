@@ -144,11 +144,11 @@ class SysInfo {
             
         else // Else (If the OS is (Unix-like))
             // Get currently running shell from the system environment
-            ShellInfo = SysGet("SHELL")
+            shellInfo = SysGet("SHELL")
             // Get shell name only from its path e.g. /usr/bin/fish --> fish
-            shell[:name] = JustFileName(ShellInfo)
+            shell[:name] = JustFileName(shellInfo)
             // Execute the shell with the version argument to retrieve the shell version
-            shellVersion = systemCmd(ShellInfo + " --version")
+            shellVersion = systemCmd(shellInfo + " --version")
 
             // Switch statement to determine the shell type and extract its version
             switch shell[:name] {
