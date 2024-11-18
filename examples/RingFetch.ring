@@ -30,8 +30,8 @@ osName = sys.os()[:name]
 arch = sys.arch()
 // Get Kernel Version
 version = sys.version()
-// Get CPU name
-cpuName = sys.cpu()[:name]
+// Get CPU model
+cpuModel = sys.cpu()[:model]
 // Get CPU cores
 cpuCores = sys.cpu()[:cores]
 // Get CPU threads
@@ -87,7 +87,7 @@ print("
     Arch: #{arch}
     Kernel: #{version}
     Packages: #{pcount}
-    CPU: #{cpuName} Cores: #{cpuCores}, Threads: #{cpuThreads}, Usage: #{cpuUsage}#{cpuTemp}
+    CPU: #{cpuModel} Cores: #{cpuCores}, Threads: #{cpuThreads}, Usage: #{cpuUsage}#{cpuTemp}
     GPU: #{gpu}
     RAM: Size: #{ramSize}, Used: #{ramUsed}, Free: #{ramFree}
     Uptime: #{uptime}

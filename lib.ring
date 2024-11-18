@@ -472,7 +472,7 @@ class SysInfo {
         else // Else (If the OS is (Unix-like))
             // Initialize cpuInfo list
             cpuInfo = [
-                :name = "Unknown",
+                :model = "Unknown",
                 :cores = "0",
                 :threads = "0",
                 :usage = NULL,
@@ -500,7 +500,7 @@ class SysInfo {
                     // Find the position of the colon
                     colonPos = substr(line, ":")
                     if (colonPos > 0) {
-                        cpuInfo[:name] = trim(substr(line, colonPos + 1))
+                        cpuInfo[:model] = trim(substr(line, colonPos + 1))
                     }
 
                 // Check if the processor string exists

@@ -77,7 +77,7 @@ class SysInfoTest {
         ? "Testing cpu()..."
         cpuInfo = sysInfo.cpu()
         assert(isList(cpuInfo), "CPU info should be a list")
-        assert(!isNull(cpuInfo[:name]), "CPU name should not be null")
+        assert(!isNull(cpuInfo[:model]), "CPU model should not be null")
         assert(number(cpuInfo[:cores]) > 0, "CPU cores should be greater than 0")
         assert(number(cpuInfo[:threads]) > 0, "CPU threads should be greater than 0")
     }
