@@ -84,23 +84,23 @@ Check out ***[RingFetch](https://github.com/ysdragon/SysInfo/tree/main/examples)
 
 ## Supported Operating Systems
 ### Fully Tested
-- **Linux**
-    - Debian
-    - Ubuntu
-    - Void Linux
-    - Alpine Linux
-    - CentOS
-    - Rocky Linux
-    - Fedora
-    - AlmaLinux
-    - Slackware Linux
-    - Kali Linux
-    - openSUSE
-    - Gentoo Linux
-    - Arch Linux
-    - Devuan Linux
-    - Chimera Linux
-- **Windows**
+- **<img width="20" height="20" src="https://www.kernel.org/theme/images/logos/favicon.png" /> Linux**
+    - <img width="16" height="16" src="https://www.debian.org/favicon.ico" /> Debian
+    - <img width="16" height="16" src="https://netplan.readthedocs.io/en/latest/_static/favicon.png" /> Ubuntu
+    - <img width="16" height="16" src="https://voidlinux.org/assets/img/favicon.png" /> Void Linux
+    - <img width="16" height="16" src="https://www.alpinelinux.org/alpine-logo.ico" /> Alpine Linux
+    - <img width="16" height="16" src="https://www.centos.org/assets/img/favicon.png" /> CentOS
+    - <img width="16" height="16" src="https://rockylinux.org/favicon.png" /> Rocky Linux
+    - <img width="16" height="16" src="https://fedoraproject.org/favicon.ico" /> Fedora
+    - <img width="16" height="16" src="https://almalinux.org/fav/favicon.ico" /> AlmaLinux
+    - <img width="16" height="16" src="http://www.slackware.com/favicon.ico" /> Slackware Linux
+    - <img width="16" height="16" src="https://github.com/bin456789/reinstall/assets/7548515/f74b3d5b-085f-4df3-bcc9-8a9bd80bb16d" /> Kali Linux
+    - <img width="16" height="16" src="https://static.opensuse.org/favicon.ico" /> openSUSE
+    - <img width="16" height="16" src="https://www.gentoo.org/assets/img/logo/gentoo-g.png" /> Gentoo Linux
+    - <img width="16" height="16" src="https://archlinux.org/static/favicon.png" /> Arch Linux
+    - <img width="16" height="16" src="https://www.devuan.org/ui/img/favicon.ico" /> Devuan Linux
+    - <img width="16" height="16" src="https://chimera-linux.org/assets/icons/favicon48.png" /> Chimera Linux
+- **<img width="20" height="20" src="https://blogs.windows.com/wp-content/uploads/prod/2022/09/cropped-Windows11IconTransparent512-32x32.png" /> Windows**
   - Windows 10
   - Windows 11
   - Windows Server 2019
