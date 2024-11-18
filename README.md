@@ -105,6 +105,7 @@ Check out ***[RingFetch](https://github.com/ysdragon/SysInfo/tree/main/examples)
   - Windows 11
   - Windows Server 2019
   - Windows Server 2022
+  - Windows Server 2025
 
 ## Contributing
 Public contributions are welcome!  
