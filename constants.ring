@@ -29,12 +29,15 @@ foreach ($GPU in $GPU_INFO) {
 }
 $OS = (Get-CimInstance -Query 'SELECT Caption, Version, FreePhysicalMemory FROM Win32_OperatingSystem')
 $TOTAL_RAM = [math]::round((Get-CimInstance -Query 'SELECT Capacity FROM Win32_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1GB, 2)
+$PAGE_FILES = Get-CimInstance -Class Win32_PageFileUsage
 $FREE_RAM = [math]::round($OS.FreePhysicalMemory / 1MB, 2)
 $USED_RAM = [math]::round($TOTAL_RAM - $FREE_RAM, 2)
+$TOTAL_SWAP = [math]::round((($PAGE_FILES | Measure-Object -Property AllocatedBaseSize -Sum).Sum) / 1024, 2)
 $RAM = @{
     size = $TOTAL_RAM.ToString() + 'G'
     used = $USED_RAM.ToString() + 'G'
     free = $FREE_RAM.ToString() + 'G'
+    swap = $TOTAL_SWAP.ToString() + 'G'
 }
 $DISKS_RAW = Get-CimInstance -Query 'SELECT Size, DeviceID, Model FROM Win32_DiskDrive'
 $DISKS = @()

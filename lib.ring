@@ -159,7 +159,12 @@ class SysInfo {
     
     func ram() {
         // Initialize the ramInfo list
-        ramInfo = []
+        ramInfo = [
+            :size = NULL,
+            :used = NULL,
+            :free = NULL,
+            :swap = NULL
+        ]
 
         // Check if the OS is Windows
         if (isWindows()) {
@@ -174,6 +179,9 @@ class SysInfo {
 
             // Get freeRam and convert the value from KB to GB
             freeRam = ramInfo[:MemAvailable][1] / 1024 / 1024
+
+            // Get swapRam and convert the value from KB to GB
+            swapRam = ramInfo[:SwapTotal][1] / 1024 / 1024
             
             // Add size to ramInfo
             ramInfo[:size] = totalRam
@@ -181,6 +189,8 @@ class SysInfo {
             ramInfo[:used] = totalRam - freeRam
             // Add free to ramInfo
             ramInfo[:free] = freeRam
+            // Add swap to ramInfo
+            ramInfo[:swap] = swapRam
         }
                 
         // Return Ram info
@@ -586,7 +596,7 @@ class SysInfo {
         // Return the shell list
         return shell
     }
-    
+
     // Function to get Memory info
     func memoryInfo() {
         // Initialize the memInfo list

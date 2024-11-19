@@ -47,11 +47,13 @@ else
 // Get GPU name
 gpu = sys.gpu()
 // Get RAM size
-ramSize = sys.ram()[:size]
-// Get RAM used
-ramUsed = sys.ram()[:used]
-// Get RAM free
-ramFree = sys.ram()[:free]
+totalRam = sys.ram()[:size]
+// Get used RAM 
+usedRam = sys.ram()[:used]
+// Get free RAM 
+freeRam = sys.ram()[:free]
+// Get SWAP RAM
+swapRam = sys.ram()[:swap]
 /*  Get System Uptime
 Examples:
 uptime = sys.sysUptime([]) // ---> (% days, % hours, % minutes, % seconds)
@@ -89,7 +91,7 @@ print("
     Packages: #{pcount}
     CPU: #{cpuModel} Cores: #{cpuCores}, Threads: #{cpuThreads}, Usage: #{cpuUsage}#{cpuTemp}
     GPU: #{gpu}
-    RAM: Size: #{ramSize}, Used: #{ramUsed}, Free: #{ramFree}
+    RAM: Size: #{totalRam}, Used: #{usedRam}, Free: #{freeRam}, Swap: #{swapRam}
     Uptime: #{uptime}
 ")
 
