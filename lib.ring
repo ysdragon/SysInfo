@@ -438,64 +438,97 @@ class SysInfo {
             // Get CPU info from the winSysInfo list
             cpuInfo = winSysInfo[:cpu]
         else // Else (If the OS is (Unix-like))
-            // Read and get cpuinfo content
+            // Read and get CPU info content
             content = readFile("/proc/cpuinfo")
-
-            // Convert the content string lines into a list  
+            
+            // Convert the CPU info content string lines into a list  
             lines = str2List(content)
-
-            // processorCount default value
-            processorCount = 0
-            // coreCount default value
-            coreCount = 0
             
-            // siblings default value
-            siblings = 0
+            // Loop through every line of the CPU info content
             
-            // Loop through every line
             for line in lines {
-                // Check if the model name string exists
+                // Check if the CPU model name string exists 
                 if (substr(line, "model name")) {
                     // Find the position of the colon
                     colonPos = substr(line, ":")
                     if (colonPos > 0) {
                         cpuInfo[:model] = trim(substr(line, colonPos + 1))
                     }
-
-                // Check if the processor string exists
-                elseif (substr(line, "processor"))
-                    processorCount++
-
-                // Check if siblings info exists
-                elseif (substr(line, "siblings"))
-                    // Find the position of the colon
-                    colonPos = substr(line, ":")
-                    if (colonPos > 0) {
-                        siblings = number(trim(substr(line, colonPos + 1)))
-                    }
-
+                    break
+                }
+            }
+            
+            // Set cores per CPU default value
+            coresPerCPU = 0
+            // Set threads per CPU default value
+            threadsPerCPU = 0
+            
+            // Loop through every line of the CPU info content
+            for line in lines {
                 // Check if the cpu cores string exists
-                elseif (substr(line, "cpu cores"))
+                if (substr(line, "cpu cores")) {
                     // Find the position of the colon
                     colonPos = substr(line, ":")
                     if (colonPos > 0) {
-                        coreCount = number(trim(substr(line, colonPos + 1)))
+                        coresPerCPU = number(trim(substr(line, colonPos + 1)))
+                        break
                     }
                 }
             }
-
-            // Set threads count - use siblings if available, otherwise use processor count
-            if (siblings > 0) {
-                cpuInfo[:threads] = string(siblings)
-            else
-                cpuInfo[:threads] = string(processorCount)
+            
+            // Loop through every line of the CPU info content
+            for line in lines {
+                // Check if siblings info exists
+                if (substr(line, "siblings")) {
+                    // Find the position of the colon
+                    colonPos = substr(line, ":")
+                    if (colonPos > 0) {
+                        threadsPerCPU = number(trim(substr(line, colonPos + 1)))
+                        break
+                    }
+                }
             }
             
-            // If coreCount greater than 0, set the coreCount to :cores 
-            if (coreCount > 0) {
-                cpuInfo[:cores] = string(coreCount)
-            else // Else (if the coreCount is equal to 0, set threads to :cores)
-                cpuInfo[:cores] = cpuInfo[:threads]
+            // Initialize physical CPU IDs
+            physicalIDs = []
+            
+            // Loop through every line of the CPU info content
+            for line in lines {
+                // Check if the physical id string exists
+                if (substr(line, "physical id")) {
+                    // Find the position of the colon
+                    colonPos = substr(line, ":")
+                    if (colonPos > 0) {
+                        physID = trim(substr(line, colonPos + 1))
+                        if (!find(physicalIDs, physID)) {
+                            add(physicalIDs, physID)
+                        }
+                    }
+                }
+            }
+            
+            // Get the number of physical CPUs
+            numPhysicalCPUs = len(physicalIDs)
+            
+            // Check if the value of cores per CPU is 0
+            if (coresPerCPU = 0) {
+                processorCount = 0
+                for line in lines {
+                    if (substr(line, "processor")) {
+                        processorCount++
+                    }
+                }
+
+                cpuInfo[:cores] = string(processorCount)
+                cpuInfo[:threads] = string(processorCount)
+            else // Count processors if we couldn't get the counts
+                // Calculate total cores
+                totalCores = coresPerCPU * numPhysicalCPUs
+                // Calculate total threads
+                totalThreads = threadsPerCPU * numPhysicalCPUs
+                
+                cpuInfo[:cores] = string(totalCores)
+                cpuInfo[:threads] = string(totalThreads)
             }
 
             // Get initial CPU stats (CPU load)
@@ -527,13 +560,13 @@ class SysInfo {
                 // Get CPU temp
                 cpuTemp = number(readFile(tempFile))
                 // Convert CPU temp from millidegrees to degrees
-                cpuInfo[:temp]  = cpuTemp / 1000
+                cpuInfo[:temp] = cpuTemp / 1000
             else // If tempFile doesn't exist
                 cpuInfo[:temp] = NULL
             }
         }
 
-        // Return CPU info
+        // Return the CPU info list
         return cpuInfo
     }
 
