@@ -110,8 +110,9 @@ class SysInfoTest {
         ramInfo = sysInfo.ram()
         assert(isList(ramInfo), "RAM info should be a list")
         assert(number(ramInfo[:size]) > 0, "RAM size should be greater than 0")
-        assert(number(ramInfo[:used]) >= 0, "RAM used should be non-negative")
-        assert(number(ramInfo[:free]) >= 0, "RAM free should be non-negative")
+        assert(number(ramInfo[:used]) >= 0, "Used RAM should be non-negative")
+        assert(number(ramInfo[:free]) >= 0, "Free RAM should be non-negative")
+        assert(number(ramInfo[:swap]) >= 0, "Swap RAM should be non-negative")
     }
 
     func testStorageDisks() {
