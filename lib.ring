@@ -351,14 +351,12 @@ class SysInfo {
 
     // Function to get osInfo
     func osInfo() {
-        // Initialize the osInfo list
-        osInfo = []
-
-        // OS name default value
-        osInfo[:name] = "Unknown"
-        // OS id default value
-        osInfo[:id] = "unknown"
-
+        // Initialize the OS info list
+        osInfo = [
+            :name = "Unknown",
+            :id = "unknown"
+        ]
+        
         // Check if the OS is Windows
         if (isWindows()) {
             // Get the OS name from winSysInfo List
@@ -426,23 +424,20 @@ class SysInfo {
 
     // Function to get CPU info
     func cpuInfo() {
-        // Initialize the cpuInfo list
-        cpuInfo = []
+        // Initialize the CPU info list
+        cpuInfo = [
+            :model = "Unknown",
+            :cores = "0",
+            :threads = "0",
+            :usage = NULL,
+            :temp = NULL
+        ]
 
         // Check if the OS is Windows
         if (isWindows()) {
             // Get CPU info from the winSysInfo list
             cpuInfo = winSysInfo[:cpu]
         else // Else (If the OS is (Unix-like))
-            // Initialize cpuInfo list
-            cpuInfo = [
-                :model = "Unknown",
-                :cores = "0",
-                :threads = "0",
-                :usage = NULL,
-                :temp = NULL
-            ]
-
             // Read and get cpuinfo content
             content = readFile("/proc/cpuinfo")
 
@@ -490,7 +485,7 @@ class SysInfo {
             }
 
             // Set threads count - use siblings if available, otherwise use processor count
-            if siblings > 0 {
+            if (siblings > 0) {
                 cpuInfo[:threads] = string(siblings)
             else
                 cpuInfo[:threads] = string(processorCount)
@@ -516,10 +511,10 @@ class SysInfo {
             diffs = []
 
             // Calculate the diffs between updated and initial stats
-            for i = 1 to len(initialStats)
+            for i = 1 to len(initialStats) {
                 // Subtract initial value from updated value and add the diff to the diffs list
                 add(diffs, updatedStats[i] - initialStats[i])
-            next
+            }
 
             // Get calculated CPU usage
             cpuInfo[:usage] = 100 * (sumlist(diffs) - diffs[4]) / sumlist(diffs)
