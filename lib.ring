@@ -131,55 +131,9 @@ class SysInfo {
 
     // Function to get currently running shell
     func shell() {
-        // Initialize the shell list with default values
-        shell = [
-            :name = "Unknown",
-            :version = "Unknown"
-        ]
+        // Get shell info from shellInfo
+        shell = shellInfo()
 
-        // Check if the OS is Windows
-        if (isWindows()) {
-            // Get currently running shell name and version from winSysInfo
-            shell = winSysInfo[:shell]
-            
-        else // Else (If the OS is (Unix-like))
-            // Get currently running shell from the system environment
-            shellInfo = SysGet("SHELL")
-            // Get shell name only from its path e.g. /usr/bin/fish --> fish
-            shell[:name] = JustFileName(shellInfo)
-            // Execute the shell with the version argument to retrieve the shell version
-            shellVersion = systemCmd(shellInfo + " --version")
-
-            // Switch statement to determine the shell type and extract its version
-            switch shell[:name] {
-                case "bash"
-                    // Find the position of the version number in the shellVersion string
-                    versionPos = substr(shellVersion, "version ") + len("version ")
-                    // Extract the version number from the shellVersion string
-                    shell[:version] = substr(shellVersion, versionPos, substr(shellVersion, "(") - versionPos)
-                case "fish"
-                    // Find the position of the version number in the shellVersion string
-                    versionPos = substr(shellVersion, "version ") + len("version ")
-                    // Extract the version number from the shellVersion string
-                    shell[:version] = substr(shellVersion, versionPos)
-                case "zsh"
-                    // Find the position of the version number in the shellVersion string
-                    versionPos = substr(shellVersion, "zsh ") + len("zsh ")
-                    // Extract the version number from the shellVersion string
-                    shell[:version] = substr(shellVersion, versionPos)
-                case "tcsh"
-                    // Find the position of the version number in the ShellVersion string
-                    versionPos = substr(shellVersion, "tcsh ") + len("tcsh ")
-                    // Extract the version number from the shellVersion string
-                    shell[:version] = substr(shellVersion, versionPos, substr(shellVersion, "(") - versionPos)
-                case "ksh"
-                    // Find the position of the version number in the shellVersion string
-                    versionPos = substr(shellVersion, "/") + len("/")
-                    // Extract the version number from the shellVersion string
-                    shell[:version] = substr(shellVersion, versionPos)                    
-            }
-        }
-        
         // Return the shell list
         return shell
     }
@@ -578,6 +532,61 @@ class SysInfo {
         return cpuInfo
     }
 
+    // Function to get shell info
+    func shellInfo() {
+        // Initialize the shell list with default values
+        shell = [
+            :name = "Unknown",
+            :version = "Unknown"
+        ]
+
+        // Check if the OS is Windows
+        if (isWindows()) {
+            // Get currently running shell name and version from winSysInfo
+            shell = winSysInfo[:shell]
+            
+        else // Else (If the OS is (Unix-like))
+            // Get currently running shell from the system environment
+            shellInfo = SysGet("SHELL")
+            // Get shell name only from its path e.g. /usr/bin/fish --> fish
+            shell[:name] = JustFileName(shellInfo)
+            // Execute the shell with the version argument to retrieve the shell version
+            shellVersion = systemCmd(shellInfo + " --version")
+
+            // Switch statement to determine the shell type and extract its version
+            switch shell[:name] {
+                case "bash"
+                    // Find the position of the version number in the shellVersion string
+                    versionPos = substr(shellVersion, "version ") + len("version ")
+                    // Extract the version number from the shellVersion string
+                    shell[:version] = substr(shellVersion, versionPos, substr(shellVersion, "(") - versionPos)
+                case "fish"
+                    // Find the position of the version number in the shellVersion string
+                    versionPos = substr(shellVersion, "version ") + len("version ")
+                    // Extract the version number from the shellVersion string
+                    shell[:version] = substr(shellVersion, versionPos)
+                case "zsh"
+                    // Find the position of the version number in the shellVersion string
+                    versionPos = substr(shellVersion, "zsh ") + len("zsh ")
+                    // Extract the version number from the shellVersion string
+                    shell[:version] = substr(shellVersion, versionPos)
+                case "tcsh"
+                    // Find the position of the version number in the ShellVersion string
+                    versionPos = substr(shellVersion, "tcsh ") + len("tcsh ")
+                    // Extract the version number from the shellVersion string
+                    shell[:version] = substr(shellVersion, versionPos, substr(shellVersion, "(") - versionPos)
+                case "ksh"
+                    // Find the position of the version number in the shellVersion string
+                    versionPos = substr(shellVersion, "/") + len("/")
+                    // Extract the version number from the shellVersion string
+                    shell[:version] = substr(shellVersion, versionPos)                    
+            }
+        }
+        
+        // Return the shell list
+        return shell
+    }
+    
     // Function to get Memory info
     func memoryInfo() {
         // Initialize the memInfo list
