@@ -320,31 +320,40 @@ class SysInfo {
     
     // Function to check if the machine is a VM
     func isVM() {
-        // Initialize isVM
-        isVM = NULL
-
         // Check if the OS is Windows
         if (isWindows()) {
             isVM = winSysInfo[:isVM]
-        else // Else (If the OS is (Unix-like))
-            // Get cpuInfo from /proc/cpuinfo
-            cpuInfo = readFile("/proc/cpuinfo")
             
-            // List of virtualization indicators to check
-            virtIndicators = ["hypervisor", "kvm", "vmware", "vbox", "xen", "qemu", "docker"]
+            return isVM
+        else // Else (If the OS is (Unix-like))
+            // Define a list of dmi file paths
+            dmiPaths = [
+                "/sys/class/dmi/id/product_name",
+                "/sys/class/dmi/id/sys_vendor", 
+                "/sys/class/dmi/id/board_vendor", 
+                "/sys/class/dmi/id/bios_vendor",
+                "/sys/class/dmi/id/product_version"
+            ]
 
-            // Loop through virtIndicators list
-            for virt in virtIndicators {
-                // Determine if it's a VM
-                if (substr(cpuInfo, virt)) {  
-                    // Return true if the machine is a VM
-                    isVM = true
+            // Loop through each dmi path to check for virtualization indicators
+            for path in dmiPaths  {
+                // Check if the current DMI path exists
+                if (fexists(path)) {
+                    // Read the content of the dmi file and split it into lines
+                    dmiContent = split(readFile(path), nl)
+                    // Loop through the list of known virtualization indicators
+                    for indicator in virtIndicators {
+                        if (dmiContent[1] = indicator) {
+                            // Return true if a match is found
+                            return true
+                        }
+                    }
                 }
             }
         }
 
-        // Return isVM
-        return isVM
+        // Return false if no virtualization indicators were found
+        return false
     }
 
     private
