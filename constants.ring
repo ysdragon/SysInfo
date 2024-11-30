@@ -101,3 +101,23 @@ pManagers = [
     :slackpkg = [:supported = ["slackware", "porteus", "porteux", "absolute"], :cmd = "ls /var/log/packages | wc -l", :name = "slackpkg"],
     :brew = [:supported = ["any"], :cmd = "brew list --cellar | wc -l", :name = "brew"]
 ]
+
+// Virtualization indicators list 
+virtIndicators = [
+    "KVM",
+    "QEMU",
+    "VMware",
+    "VMW",
+    "innotek",
+    "Xen",
+    "Bochs",
+    "Parallels",
+    "BHYVE",
+    "OpenStack",
+    "KubeVirt",
+    "Amazon EC2",
+    "Oracle Corporation",
+    "Hyper-V",
+    "Apple Virtualization",
+    "Google Compute Engine"
+]
