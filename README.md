@@ -102,6 +102,7 @@ Check out ***[RingFetch](https://github.com/ysdragon/SysInfo/tree/main/examples)
     - <img width="16" height="16" src="https://chimera-linux.org/assets/icons/favicon48.png" /> Chimera Linux
     - <img width="16" height="16" src="https://www.openeuler.org/favicon.ico" /> openEuler
     - <img width="16" height="16" src="https://www.oracle.com/asset/web/favicons/favicon-32.png" /> Oracle
+    - <img width="16" height="16" src="https://www.redhat.com/favicon.ico" /> Red Hat
 - **<img width="20" height="20" src="https://blogs.windows.com/wp-content/uploads/prod/2022/09/cropped-Windows11IconTransparent512-32x32.png" /> Windows**
   - Windows 10
   - Windows 11
