@@ -48,10 +48,10 @@ $FREE_RAM = [math]::round($OS.FreePhysicalMemory / 1MB, 2)
 $USED_RAM = [math]::round($TOTAL_RAM - $FREE_RAM, 2)
 $TOTAL_SWAP = [math]::round((($PAGE_FILES | Measure-Object -Property AllocatedBaseSize -Sum).Sum) / 1024, 2)
 $RAM = @{
-    size = $TOTAL_RAM.ToString() + 'G'
-    used = $USED_RAM.ToString() + 'G'
-    free = $FREE_RAM.ToString() + 'G'
-    swap = $TOTAL_SWAP.ToString() + 'G'
+    size = $TOTAL_RAM
+    used = $USED_RAM
+    free = $FREE_RAM
+    swap = $TOTAL_SWAP
 }
 $DISKS_RAW = Get-CimInstance -Query 'SELECT Size, DeviceID, Model FROM Win32_DiskDrive'
 $DISKS = @()
@@ -78,7 +78,7 @@ $SHELL = @{
     name = $SHELL_NAME
     version = $SHELL_VERSION
 }
-$isVM = (Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer -match 'Microsoft Corporation|VMware|Xen|KVM|VirtualBox|QEMU'
+$isVM = [int]((Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer -match 'Microsoft Corporation|VMware|Xen|KVM|VirtualBox|QEMU')
 $Result = @{
     cpu = $CPU
     gpu = $GPUs
@@ -91,7 +91,7 @@ $Result = @{
     shell = $SHELL
     isVM = $isVM
 }
-Write-Output (ConvertTo-Json $Result)`
+Write-Output (ConvertTo-Json $Result -Depth 4)`
 
 // Time units
 tUnits = [
