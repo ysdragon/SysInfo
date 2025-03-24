@@ -1,0 +1,15 @@
+name: Test CI
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        uses: ysdragon/ring-action@v1.0.4
+        with:
+          file: "lib.ring"
