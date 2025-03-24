@@ -80,6 +80,20 @@ class SysInfoTest {
         assert(!isNull(cpuInfo[:model]), "CPU model should not be null")
         assert(number(cpuInfo[:cores]) > 0, "CPU cores should be greater than 0")
         assert(number(cpuInfo[:threads]) > 0, "CPU threads should be greater than 0")
+        assert(number(cpuInfo[:count]) > 0, "CPU count should be greater than 0")
+        assert(!isNull(cpuInfo[:usage]), "CPU usage should not be null")
+        assert(isList(cpuInfo[:cpus]), "CPU specific info should be a list")
+        assert(len(cpuInfo[:cpus]) > 0, "CPU specific info should not be empty")
+        
+        // Test first CPU in the cpus list
+        firstCPU = cpuInfo[:cpus][1]
+        assert(number(firstCPU[:number]) > 0, "CPU number should be greater than 0")
+        assert(!isNull(firstCPU[:model]), "CPU specific model should not be null")
+        assert(number(firstCPU[:cores]) > 0, "CPU specific cores should be greater than 0")
+        assert(number(firstCPU[:threads]) > 0, "CPU specific threads should be greater than 0")
+
+        // CPU temperature may be null in VMs, so we only check if it's null or a number
+        assert(isNull(cpuInfo[:temp]) or number(cpuInfo[:temp]) >= 0, "CPU temperature should be null or non-negative")
     }
 
     func testGPU() {
