@@ -735,8 +735,8 @@ class SysInfo {
     func readFile(file) {
         // Open the specified file in read-only mode
         fp = fopen(file, "r")
-        // Read up to 4096 bytes from the file
-        result = fread(fp, 4096)
+        // Read up to 102400 bytes from the file
+        result = fread(fp, 102400)
         // Close the file stream
         fclose(fp)
 
