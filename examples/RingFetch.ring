@@ -74,8 +74,18 @@ totalRam = sys.ram()[:size]
 usedRam = sys.ram()[:used]
 // Get free RAM 
 freeRam = sys.ram()[:free]
-// Get SWAP RAM
-swapRam = sys.ram()[:swap]
+
+// Initialize swapRam
+swapRam = NULL
+// Check if the OS is Windows
+if (isWindows()) {
+    // Get Pagefile size
+    swapRam = "Pagefile: " + sys.ram()[:swap]
+elseif (isUnix())
+    // Get Swap size
+    swapRam = "Swap: " + sys.ram()[:swap]
+}
+
 /*  Get System Uptime
  * Examples:
  * uptime = sys.sysUptime([]) // ---> (% days, % hours, % minutes, % seconds)
@@ -113,7 +123,7 @@ print("
     Packages: #{pcount}
     CPU: #{cpuModel} Cores: #{cpuCores}, Threads: #{cpuThreads}, Usage: #{cpuUsage}#{cpuTemp}
     GPU: #{gpu}
-    RAM: Size: #{totalRam}, Used: #{usedRam}, Free: #{freeRam}, Swap: #{swapRam}
+    RAM: Size: #{totalRam}, Used: #{usedRam}, Free: #{freeRam}, #{swapRam}
     Uptime: #{uptime}
 ")
 
