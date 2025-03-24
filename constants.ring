@@ -6,19 +6,33 @@
 PS_SCRIPT = `$CPU_INFO = (Get-CimInstance -Query 'SELECT Name, NumberOfCores, NumberOfLogicalProcessors FROM Win32_Processor')
 $CPU_USAGE = (Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 1 -MaxSamples 1).CounterSamples.CookedValue
 $CPU_MODELS = @()
+$CPU_COUNT = 0
+$TOTAL_CORES = 0
+$TOTAL_THREADS = 0
+$CPUS = @()
+
 foreach ($CPU in $CPU_INFO) {
     $CPU_MODEL = $CPU.Name.Trim()
     $TOTAL_CORES += $CPU.NumberOfCores
     $TOTAL_THREADS += $CPU.NumberOfLogicalProcessors
     $CPU_MODELS += $CPU_MODEL
     $CPU_COUNT++
+    
+    $CPUS += @{
+        number = $CPU_COUNT
+        model = $CPU_MODEL
+        cores = $CPU.NumberOfCores
+        threads = $CPU.NumberOfLogicalProcessors
+    }
 }
+
 $CPU = @{
-    cores = $TOTAL_CORES
     count = $CPU_COUNT
-    model = [string]::Join(", ", $CPU_MODELS)
+    model = $CPU_MODELS[0]
+    cores = $TOTAL_CORES
     threads = $TOTAL_THREADS
     usage = [math]::round($CPU_USAGE, 2)
+    cpus = $CPUS
 }
 $GPU_INFO = (Get-CimInstance -Query 'SELECT Caption FROM Win32_VideoController')
 $GPUs = @()

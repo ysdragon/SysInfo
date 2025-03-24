@@ -13,25 +13,47 @@ hostname = sys.hostname()
 // Get username
 username = sys.username()
 /* Get Shell
-shellName = sys.shell()[:name] // ---> Get shell name
-shellVersion = sys.shell()[:version] // ---> Get shell version
-*/
+ * shellName = sys.shell()[:name] // ---> Get shell name
+ * shellVersion = sys.shell()[:version] // ---> Get shell version
+ */
 shell = sys.shell()[:name] + " " + sys.shell()[:version]
 /* Get currently running terminal (For Unix-like OSes only)
 term = sys.term()
 */
+
 /* Get OS info
-Examples:
-osName = sys.os()[:name] // ---> Get OS name
-osID = sys.os()[:id] // ---> Get OS id
-*/
+ * Examples:
+ * osName = sys.os()[:name] // ---> Get OS name
+ * osID = sys.os()[:id] // ---> Get OS id
+ */
 osName = sys.os()[:name]
 // Get System Architecture
 arch = sys.arch()
 // Get Kernel Version
 version = sys.version()
-// Get CPU model
-cpuModel = sys.cpu()[:model]
+
+/* Get CPU Info
+ * Examples:
+ * cpuCount = sys.cpu()[:count] // ---> Get CPU count
+ * cpuModel = sys.cpu()[:model] // ---> Get CPU model
+ * cpuCores = sys.cpu()[:cores] // ---> Get CPU cores
+ * cpuThreads = sys.cpu()[:threads] // ---> Get CPU threads
+ * cpuUsage = sys.cpu()[:usage] // ---> Get CPU usage
+ * cpuTemp = sys.cpu()[:temp] // ---> Get CPU temp (Currently for Unix-like OSes only)
+ */
+
+// Get CPU count
+cpuCount = sys.cpu()[:count]
+
+// Check if CPU count is greater than 1
+if (cpuCount > 1) {
+    // Get CPU model
+    cpuModel = string(cpuCount) + "x " + sys.cpu()[:model]
+else
+    // Get CPU model
+    cpuModel = sys.cpu()[:model]
+}
+
 // Get CPU cores
 cpuCores = sys.cpu()[:cores]
 // Get CPU threads
@@ -39,7 +61,7 @@ cpuThreads = sys.cpu()[:threads]
 // Get CPU usage
 cpuUsage = string(sys.cpu()[:usage]) + "%"
 // Get CPU temp (Currently for Unix-like OSes only)
-if(isUnix()) {
+if(isUnix() && !sys.isVM()) {
     cpuTemp = ", Temp " + sys.cpu()[:temp] + "°"
 else
     cpuTemp = NULL
@@ -55,15 +77,15 @@ freeRam = sys.ram()[:free]
 // Get SWAP RAM
 swapRam = sys.ram()[:swap]
 /*  Get System Uptime
-Examples:
-uptime = sys.sysUptime([]) // ---> (% days, % hours, % minutes, % seconds)
-uptime = sys.sysUptime([:days = 1, :hours = 1, :minutes = 1, :seconds = 1]) //  ---> (% days, % hours, % minutes, % seconds)
-uptime = sys.sysUptime([:days = 1, :hours = 1, :minutes = 1]) // ---> (% days, % hours, % minutes)
-uptime = sys.sysUptime([:days = 1, :hours = 1]) // ---> (% days, % hours)
-uptime = sys.sysUptime([:days = 1, :minutes = 1]) // ---> (% days, % minutes)
-uptime = sys.sysUptime([:days = 1]) // ---> (% days)
-uptime = sys.sysUptime([:minutes = 1]) // ---> (% minutes)
-uptime = sys.sysUptime([:hours = 1]) // ---> (% hours)
+ * Examples:
+ * uptime = sys.sysUptime([]) // ---> (% days, % hours, % minutes, % seconds)
+ * uptime = sys.sysUptime([:days = 1, :hours = 1, :minutes = 1, :seconds = 1]) //  ---> (% days, % hours, % minutes, % seconds)
+ * uptime = sys.sysUptime([:days = 1, :hours = 1, :minutes = 1]) // ---> (% days, % hours, % minutes)
+ * uptime = sys.sysUptime([:days = 1, :hours = 1]) // ---> (% days, % hours)
+ * uptime = sys.sysUptime([:days = 1, :minutes = 1]) // ---> (% days, % minutes)
+ * uptime = sys.sysUptime([:days = 1]) // ---> (% days)
+ * uptime = sys.sysUptime([:minutes = 1]) // ---> (% minutes)
+ * uptime = sys.sysUptime([:hours = 1]) // ---> (% hours)
 */
 uptime = sys.sysUptime([])
 // Get Packages count for Unix-like OSes or Program Count for Windows
