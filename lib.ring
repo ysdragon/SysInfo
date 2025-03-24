@@ -43,9 +43,13 @@ class SysInfo {
 
             return SysGet("USERNAME")
         else // Else (If the OS is (Unix-like))
-
-            // Get the USER environment variable
-            return SysGet("USER")
+            if (!isNull(SysGet("USER"))) {
+                return SysGet("USER")
+            elseif (!isNull(SysGet("USERNAME")))
+                return SysGet("USERNAME")
+            else
+                return systemCmd("whoami")
+            }
         }
     }
 
@@ -610,6 +614,9 @@ class SysInfo {
                     versionPos = substr(shellVersion, "/") + len("/")
                     // Extract the version number from the shellVersion string
                     shell[:version] = substr(shellVersion, versionPos)                    
+                else
+                    shell[:name] = "Unknown"
+                    shell[:version] = "Unknown"
             }
         }
         
