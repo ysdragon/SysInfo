@@ -9,7 +9,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Run tests
-        uses: ysdragon/ring-action@v1.0.4
+        uses: ysdragon/ring-action@v1.0.6
         with:
-          file: "lib.ring"
+          file: "tests/SysInfo_test.ring"
