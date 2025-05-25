@@ -71,8 +71,10 @@ sys = new SysInfo
 ? "OS: " + sys.os()[:name]
 ? "Hostname: " + sys.hostname()
 ? "CPU: " + sys.cpu()[:model]
-? "Total RAM: " + sys.ram()[:size] + " GB"
+? "Total RAM: " + (sys.ram()[:size] / 1024) + " GB"
 ```
+
+For detailed API documentation, please refer to the [SysInfo Library Documentation](./docs/API.md).
 
 ## Example
 Check out ***[RingFetch](https://github.com/ysdragon/SysInfo/tree/main/examples)***, a complete system information display tool built with SysInfo.
@@ -103,6 +105,9 @@ Check out ***[RingFetch](https://github.com/ysdragon/SysInfo/tree/main/examples)
     - <img width="16" height="16" src="https://www.openeuler.org/favicon.ico" /> openEuler
     - <img width="16" height="16" src="https://www.oracle.com/asset/web/favicons/favicon-32.png" /> Oracle
     - <img width="16" height="16" src="https://www.redhat.com/favicon.ico" /> Red Hat
+- **<img width="20" height="20" src="https://www.freebsd.org/favicon.ico" /> FreeBSD**
+    - FreeBSD 14
+    - FreeBSD 15
 - **<img width="20" height="20" src="https://blogs.windows.com/wp-content/uploads/prod/2022/09/cropped-Windows11IconTransparent512-32x32.png" /> Windows**
   - Windows 10
   - Windows 11
