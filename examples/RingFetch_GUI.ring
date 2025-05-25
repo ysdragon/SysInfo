@@ -1,16 +1,29 @@
 /*
+    RingFetch GUI - A graphical system information display tool
     Author: ysdragon (https://github.com/ysdragon)
-    GUI Example using LibUI and SysInfo package
+    
+    This example demonstrates how to create a GUI application using LibUI 
+    and the SysInfo package.
+    
+    Features:
+    - System Overview (hostname, username, OS info, environment)
+    - Hardware Information (CPU, RAM, GPU with temperature monitoring)
+    - Storage Information (physical disks and mounted partitions)
+    - Network Interfaces (active network connections with IP addresses)
 */
 
 load "libui.ring"
 load "SysInfo.ring"
 
 func main() {
-    // Create a new instance of the SysInfo class
+    // Initialize the SysInfo class to access system information methods
     sys = new SysInfo
 
-    // Retrieve system info
+    // ===========================================
+    // SYSTEM INFORMATION RETRIEVAL
+    // ===========================================
+    
+    // Basic system identification
     hostname = sys.hostname()
     username = sys.username()
     shell = sys.shell()[:name] + " " + sys.shell()[:version]
@@ -20,46 +33,55 @@ func main() {
     pcount = sys.pCount()
     uptime = sys.sysUptime([])
 
-    // Retrieve CPU info
+    // CPU information with performance metrics
     cpuModel = sys.cpu()[:model]
     cpuCores = string(sys.cpu()[:cores])
     cpuThreads = string(sys.cpu()[:threads])
     cpuUsage = string(sys.cpu()[:usage]) + "%"
 
-    // Retrieve memory info
+    // Memory statistics (all values in MB)
     totalRam = sys.ram()[:size]
     usedRam = sys.ram()[:used]
     freeRam = sys.ram()[:free]
     swapRam = sys.ram()[:swap]
 
-    // Retrieve GPU info
+    // Graphics hardware information
     gpuInfo = sys.gpu()
 
-    // Retrieve storage disks
+    // Storage devices and partitions
     disks = sys.storageDisks()
-
-    // Retrieve storage parts
     parts = sys.storageParts()
 
-    // Create the main window
-    mainWindow = uiNewWindow("RingFetch GUI", 570, 450, 0)
+    // Network interface information
+    networkInfo = sys.network()
+
+    // ===========================================
+    // GUI WINDOW SETUP
+    // ===========================================
+    
+    // Create the main application window with title and dimensions
+    mainWindow = uiNewWindow("RingFetch GUI - System Information Tool", 600, 500, 0)
     uiWindowOnClosing(mainWindow, "onClosing()")
     uiWindowSetMargined(mainWindow, 1)
 
-    // Main container
+    // Main container for all GUI elements
     mainBox = uiNewVerticalBox()
     uiBoxSetPadded(mainBox, 1)
     uiWindowSetChild(mainWindow, uiControl(mainBox))
 
+    // Create tabbed interface for organized information display
     mainTab = uiNewTab()
     uiBoxAppend(mainBox, uiControl(mainTab), 1)
 
-    // System Overview tab
+    // ===========================================
+    // SYSTEM OVERVIEW TAB
+    // ===========================================
+    
     sysInfoPage = uiNewVerticalBox()
     uiBoxSetPadded(sysInfoPage, 1)
-    uiTabAppend(mainTab, "💻 System", uiControl(sysInfoPage))
+    uiTabAppend(mainTab, "💻 System Overview", uiControl(sysInfoPage))
 
-    // Host Information Group
+    // Host Information Group - Basic system identification
     hostGroup = uiNewGroup("Host Information")
     uiGroupSetMargined(hostGroup, 1)
     hostBox = uiNewVerticalBox()
@@ -69,33 +91,35 @@ func main() {
     uiFormSetPadded(hostForm, 1)
     uiFormAppend(hostForm, "Hostname:", uiControl(uiNewLabel(hostname)), 0)
     uiFormAppend(hostForm, "Username:", uiControl(uiNewLabel(username)), 0)
-    uiFormAppend(hostForm, "Uptime:", uiControl(uiNewLabel(uptime)), 0)
+    uiFormAppend(hostForm, "System Uptime:", uiControl(uiNewLabel(uptime)), 0)
 
     uiBoxAppend(hostBox, uiControl(hostForm), 1)
     uiGroupSetChild(hostGroup, uiControl(hostBox))
     uiBoxAppend(sysInfoPage, uiControl(hostGroup), 0)
-    uiBoxAppend(sysInfoPage, uiControl(uiNewLabel("")), 0)
+    
+    // Add visual separator between sections
+    uiBoxAppend(sysInfoPage, uiControl(uiNewVerticalSeparator()), 0)
 
-    // Operating System Group
-    osGroup = uiNewGroup("Operating System")
+    // Operating System Group - OS details and architecture
+    osGroup = uiNewGroup("Operating System Information")
     uiGroupSetMargined(osGroup, 1)
     osBox = uiNewVerticalBox()
     uiBoxSetPadded(osBox, 1)
 
     osForm = uiNewForm()
     uiFormSetPadded(osForm, 1)
-    uiFormAppend(osForm, "OS Name:", uiControl(uiNewLabel(osName)), 0)
+    uiFormAppend(osForm, "Operating System:", uiControl(uiNewLabel(osName)), 0)
     uiFormAppend(osForm, "Architecture:", uiControl(uiNewLabel(arch)), 0)
-    uiFormAppend(osForm, "Kernel:", uiControl(uiNewLabel(kernelVer)), 0)
+    uiFormAppend(osForm, "Kernel Version:", uiControl(uiNewLabel(kernelVer)), 0)
 
     uiBoxAppend(osBox, uiControl(osForm), 1)
     uiGroupSetChild(osGroup, uiControl(osBox))
     uiBoxAppend(sysInfoPage, uiControl(osGroup), 0)
 
-    uiBoxAppend(sysInfoPage, uiControl(uiNewLabel("")), 0)
+    uiBoxAppend(sysInfoPage, uiControl(uiNewVerticalSeparator()), 0)
 
-    // Environment Group
-    envGroup = uiNewGroup("Environment")
+    // Environment Group - Shell and package information
+    envGroup = uiNewGroup("Environment Information")
     uiGroupSetMargined(envGroup, 1)
     envBox = uiNewVerticalBox()
     uiBoxSetPadded(envBox, 1)
@@ -103,47 +127,49 @@ func main() {
     envForm = uiNewForm()
     uiFormSetPadded(envForm, 1)
     uiFormAppend(envForm, "Shell:", uiControl(uiNewLabel(shell)), 0)
-    uiFormAppend(envForm, "Packages:", uiControl(uiNewLabel(string(pcount))), 0)
+    uiFormAppend(envForm, "Installed Packages:", uiControl(uiNewLabel(string(pcount))), 0)
 
     uiBoxAppend(envBox, uiControl(envForm), 1)
     uiGroupSetChild(envGroup, uiControl(envBox))
     uiBoxAppend(sysInfoPage, uiControl(envGroup), 0)
 
-    // Hardware tab
+    // ===========================================
+    // HARDWARE INFORMATION TAB
+    // ===========================================
+    
     hwPage = uiNewVerticalBox()
     uiBoxSetPadded(hwPage, 1)
     uiTabAppend(mainTab, "🔧 Hardware", uiControl(hwPage))
 
-    // CPU Group
+    // CPU Group - Processor information with temperature monitoring
     cpuGroup = uiNewGroup("Processor Information")
     uiGroupSetMargined(cpuGroup, 1)
     cpuBox = uiNewVerticalBox()
     uiBoxSetPadded(cpuBox, 1)
 
+    // CPU temperature detection (Unix systems only, not available in VMs)
+    cpuTemp = "Not available"
     if (isUnix() && !sys.isVM()) {
-        tempValue = sys.cpu()[:temp]
-        if (isNull(tempValue)) {
-            cpuTemp = "Not available"
-        else
-            try {
-                cpuTemp = "" + tempValue + "°C"
-            catch
-                cpuTemp = "Not available" + cCatchError
+        try {
+            tempValue = sys.cpu()[:temp]
+            if (!isNull(tempValue)) {
+                cpuTemp = string(tempValue) + "°C"
             }
+        catch
+            cpuTemp = "Error reading temperature"
         }
-    else
-        cpuTemp = "Not available"
     }
 
-    // CPU information form
+    // CPU information form with detailed specifications
     cpuForm = uiNewForm()
     uiFormSetPadded(cpuForm, 1)
     uiBoxAppend(cpuBox, uiControl(cpuForm), 0)
-    uiFormAppend(cpuForm, "Model:", uiControl(uiNewLabel(cpuModel)), 0)
-    uiFormAppend(cpuForm, "Cores:", uiControl(uiNewLabel(cpuCores)), 0)
-    uiFormAppend(cpuForm, "Threads:", uiControl(uiNewLabel(cpuThreads)), 0)
-    uiFormAppend(cpuForm, "Usage:", uiControl(uiNewLabel(cpuUsage)), 0)
-
+    uiFormAppend(cpuForm, "CPU Model:", uiControl(uiNewLabel(cpuModel)), 0)
+    uiFormAppend(cpuForm, "Physical Cores:", uiControl(uiNewLabel(cpuCores)), 0)
+    uiFormAppend(cpuForm, "Logical Threads:", uiControl(uiNewLabel(cpuThreads)), 0)
+    uiFormAppend(cpuForm, "Current Usage:", uiControl(uiNewLabel(cpuUsage)), 0)
+    
+    // Show temperature only if available (Unix systems, non-VM)
     if (isUnix() && !sys.isVM()) {
         uiFormAppend(cpuForm, "Temperature:", uiControl(uiNewLabel(cpuTemp)), 0)
     }
@@ -151,124 +177,203 @@ func main() {
     uiGroupSetChild(cpuGroup, uiControl(cpuBox))
     uiBoxAppend(hwPage, uiControl(cpuGroup), 0)
 
-    uiBoxAppend(hwPage, uiControl(uiNewLabel("")), 0)
+    uiBoxAppend(hwPage, uiControl(uiNewVerticalSeparator()), 0)
 
-    // Memory Group
-    memGroup = uiNewGroup("Memory Status")
+    // Memory Group - RAM and swap information
+    memGroup = uiNewGroup("Memory Information")
     uiGroupSetMargined(memGroup, 1)
     memBox = uiNewVerticalBox()
     uiBoxSetPadded(memBox, 1)
 
-    // Add memory info to the form
+    // Memory statistics form (all values in MB)
     memForm = uiNewForm()
     uiFormSetPadded(memForm, 1)
     uiBoxAppend(memBox, uiControl(memForm), 0)
-    uiFormAppend(memForm, "Total RAM:", uiControl(uiNewLabel(string(totalRam))), 0)
-    uiFormAppend(memForm, "Used RAM:", uiControl(uiNewLabel(string(usedRam))), 0)
-    uiFormAppend(memForm, "Free RAM:", uiControl(uiNewLabel(string(freeRam))), 0)
-    uiFormAppend(memForm, "Swap:", uiControl(uiNewLabel(string(swapRam))), 0)
+    uiFormAppend(memForm, "Total RAM (MB):", uiControl(uiNewLabel(formatMemoryValue(totalRam))), 0)
+    uiFormAppend(memForm, "Used RAM (MB):", uiControl(uiNewLabel(formatMemoryValue(usedRam))), 0)
+    uiFormAppend(memForm, "Free RAM (MB):", uiControl(uiNewLabel(formatMemoryValue(freeRam))), 0)
+    
+    // Display swap/pagefile based on operating system
+    swapLabel = "Swap (MB):"
+    if (isWindows()) {
+        swapLabel = "Pagefile (MB):"
+    }
+    uiFormAppend(memForm, swapLabel, uiControl(uiNewLabel(formatMemoryValue(swapRam))), 0)
 
     uiGroupSetChild(memGroup, uiControl(memBox))
-
     uiBoxAppend(hwPage, uiControl(memGroup), 0)
 
-    // GPU Group
+    // GPU Group - Graphics hardware information
     gpuGroup = uiNewGroup("Graphics Information")
     uiGroupSetMargined(gpuGroup, 1)
     gpuBox = uiNewVerticalBox()
     uiBoxSetPadded(gpuBox, 1)
 
-    if (isNull(gpuInfo)) {
-        gpu = "Not available"
-    else
+    // Handle GPU information with error checking
+    gpu = "Not available"
+    if (!isNull(gpuInfo)) {
         try {
             gpu = string(gpuInfo)
         catch
-            gpu = "Not available" + cCatchError
+            gpu = "Error retrieving GPU information"
         }
     }
 
-    // Add GPU info to the form
+    // GPU information form
     gpuForm = uiNewForm()
     uiFormSetPadded(gpuForm, 1)
-    uiFormAppend(gpuForm, "Model:", uiControl(uiNewLabel(gpu)), 0)
+    uiFormAppend(gpuForm, "Graphics Card:", uiControl(uiNewLabel(gpu)), 0)
 
     uiBoxAppend(gpuBox, uiControl(gpuForm), 1)
     uiGroupSetChild(gpuGroup, uiControl(gpuBox))
     uiBoxAppend(hwPage, uiControl(gpuGroup), 0)
-    uiBoxAppend(hwPage, uiControl(uiNewLabel("")), 0)
 
+    // ===========================================
+    // STORAGE INFORMATION TAB
+    // ===========================================
+    
     storagePage = uiNewVerticalBox()
     uiBoxSetPadded(storagePage, 1)
     uiTabAppend(mainTab, "💾 Storage", uiControl(storagePage))
 
-    // Storage Disks Group
-    disksGroup = uiNewGroup("Storage Disks")
+    // Storage Disks Group - Physical storage devices
+    disksGroup = uiNewGroup("Physical Storage Devices")
     uiGroupSetMargined(disksGroup, 1)
     disksBox = uiNewVerticalBox()
     uiBoxSetPadded(disksBox, 1)
 
-    if (len(disks) > 0) {
+    if (isList(disks) && len(disks) > 0) {
         diskForm = uiNewForm()
         uiFormSetPadded(diskForm, 1)
         uiBoxAppend(disksBox, uiControl(diskForm), 0)
         
         for disk in disks {
-            diskName = disk[:name]
-            diskSize = disk[:size]
-            uiFormAppend(diskForm, diskName + ":", uiControl(uiNewLabel("Size: " + diskSize)), 0)
+            if (isList(disk)) {
+                diskName = disk[:name]
+                diskSize = disk[:size]
+                uiFormAppend(diskForm, diskName + ":", uiControl(uiNewLabel("Capacity: " + diskSize)), 0)
+            }
         }
     else
-        uiBoxAppend(disksBox, uiControl(uiNewLabel("No storage disks found")), 0)
+        uiBoxAppend(disksBox, uiControl(uiNewLabel("No physical storage devices detected")), 0)
     }
 
     uiGroupSetChild(disksGroup, uiControl(disksBox))
     uiBoxAppend(storagePage, uiControl(disksGroup), 0)
-    uiBoxAppend(storagePage, uiControl(uiNewLabel("")), 0)
+    uiBoxAppend(storagePage, uiControl(uiNewVerticalSeparator()), 0)
 
-    // Storage Partitions Group
-    partsGroup = uiNewGroup("Storage Partitions")
+    // Storage Partitions Group - Mounted volumes and partitions
+    partsGroup = uiNewGroup("Mounted Storage Partitions")
     uiGroupSetMargined(partsGroup, 1)
     partsBox = uiNewVerticalBox()
     uiBoxSetPadded(partsBox, 1)
 
-    if (len(parts) > 0) {
+    if (isList(parts) && len(parts) > 0) {
         partForm = uiNewForm()
         uiFormSetPadded(partForm, 1)
         uiBoxAppend(partsBox, uiControl(partForm), 0)
         
         for part in parts {
-            partName = part[:name]
-            partSize = "Size: " + part[:size]
-            partUsed = "Used: " + part[:used]
-            partFree = "Free: " + part[:free]
-            uiFormAppend(partForm, partName + ":", uiControl(uiNewLabel(partSize + ", " + partUsed + ", " + partFree)), 0)
+            if (isList(part)) {
+                partName = part[:name]
+                partSize = part[:size]
+                partUsed = part[:used]
+                partFree = part[:free]
+                partInfo = "Total: " + partSize + " | Used: " + partUsed + " | Free: " + partFree
+                uiFormAppend(partForm, partName + ":", uiControl(uiNewLabel(partInfo)), 0)
+            }
         }
     else
-        uiBoxAppend(partsBox, uiControl(uiNewLabel("No partitions found")), 0)
+        uiBoxAppend(partsBox, uiControl(uiNewLabel("No mounted partitions detected")), 0)
     }
 
     uiGroupSetChild(partsGroup, uiControl(partsBox))
     uiBoxAppend(storagePage, uiControl(partsGroup), 0)
-    uiBoxAppend(storagePage, uiControl(uiNewLabel("")), 0)
 
-    // Footer
+    // ===========================================
+    // NETWORK INFORMATION TAB
+    // ===========================================
+    
+    networkPage = uiNewVerticalBox()
+    uiBoxSetPadded(networkPage, 1)
+    uiTabAppend(mainTab, "🌐 Network", uiControl(networkPage))
+
+    // Network Interfaces Group - Active network connections
+    netGroup = uiNewGroup("Active Network Interfaces")
+    uiGroupSetMargined(netGroup, 1)
+    netBox = uiNewVerticalBox()
+    uiBoxSetPadded(netBox, 1)
+
+    if (isList(networkInfo) && len(networkInfo) > 0) {
+        netForm = uiNewForm()
+        uiFormSetPadded(netForm, 1)
+        uiBoxAppend(netBox, uiControl(netForm), 0)
+        
+        for interface in networkInfo {
+            if (isList(interface)) {
+                interfaceName = interface[:name]
+                interfaceIP = interface[:ip]
+                interfaceStatus = interface[:status]
+                
+                // Format network interface information
+                networkDetails = "IP: " + interfaceIP + " | Status: " + interfaceStatus
+                uiFormAppend(netForm, interfaceName + ":", uiControl(uiNewLabel(networkDetails)), 0)
+            }
+        }
+    else
+        uiBoxAppend(netBox, uiControl(uiNewLabel("No active network interfaces found")), 0)
+    }
+
+    uiGroupSetChild(netGroup, uiControl(netBox))
+    uiBoxAppend(networkPage, uiControl(netGroup), 0)
+
+    // ===========================================
+    // APPLICATION FOOTER
+    // ===========================================
+    
+    // Footer with application credits and GitHub information
     footerGroup = uiNewGroup("")
     footerBox = uiNewHorizontalBox()
     uiBoxSetPadded(footerBox, 1)
-    creditsLabel = uiNewLabel("© RingFetch GUI | Created by DraGoN")
-    githubLabel = uiNewLabel("github.com/ysdragon")
+    creditsLabel = uiNewLabel("© 2024 RingFetch GUI | Created by ysdragon")
+    githubLabel = uiNewLabel("github.com/ysdragon/SysInfo")
     uiBoxAppend(footerBox, uiControl(creditsLabel), 1)
     uiBoxAppend(footerBox, uiControl(githubLabel), 0)
     uiGroupSetChild(footerGroup, uiControl(footerBox))
     uiBoxAppend(mainBox, uiControl(footerGroup), 0)
 
-    // Show the window and start the application
+    // ===========================================
+    // APPLICATION STARTUP
+    // ===========================================
+    
+    // Display the window and start the GUI event loop
     uiControlShow(uiControl(mainWindow))
     uiMain()
 }
 
-// Function to handle window quit event
+// ===========================================
+// UTILITY FUNCTIONS
+// ===========================================
+
+/*
+    Format memory values for display
+    Handles null values and provides proper formatting
+*/
+func formatMemoryValue(value) {
+    if (isNull(value)) {
+        return "N/A"
+    }
+    try {
+        return string(value) + " MB"
+    catch
+        return "Error"
+    }
+}
+
+/*
+    Window closing event handler
+    Properly shuts down the GUI application
+*/
 func onClosing() {
     uiQuit()
 }
