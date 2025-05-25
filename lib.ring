@@ -10,23 +10,25 @@ class SysInfo {
     
     // Check if the OS is Windows
     if (isWindows()) {
-        // Create a temporary PowerShell script file in the %TEMP% directory
+        // Setup temporary PowerShell script
         psTempScript = tempname() + ".ps1"
-        // Open the file for writing
+
+        // Write script content
         fp = fopen(psTempScript, "w")
-        // Write the content of PS_SCRIPT to the temp PowerShell file
         fwrite(fp, PS_SCRIPT)
-        // Close the file stream
         fclose(fp)
-        // Execute the temp PowerShell script
+
+        // Execute PowerShell script with security bypass
         cmd = systemCmd("powershell -NoProfile -ExecutionPolicy Bypass -File " + psTempScript)
-        // Convert the returned JSON to a list
+
+        // Process results 
         winSysInfo = json2List(cmd)
-        // Delete the temp PowerShell script
+
+        // Cleanup
         OSDeleteFile(psTempScript)
     }
 
-    // Function to get the hostname
+    // Method to get the hostname
     func hostname() {
         // Execute command to get hostname
         hostname = systemCmd("hostname")
@@ -35,7 +37,7 @@ class SysInfo {
         return hostname
     }
 
-    // Function to get the username
+    // Method to get the username
     func username() {
         // Check if the OS is Windows
         if (isWindows()) {
@@ -53,7 +55,7 @@ class SysInfo {
         }
     }
 
-    // Function to get OS name
+    // Method to get OS name
     func os() {
         // Get osInfo
         osInfo = osInfo()
@@ -62,7 +64,7 @@ class SysInfo {
         return osInfo
     }
 
-    // Function to get the Kernel version
+    // Method to get the Kernel version
     func version() {
         // Get the Kernel version from kernelInfo
         kVersion = kernelInfo()
@@ -71,7 +73,7 @@ class SysInfo {
         return kVersion
     }
 
-    // Function to get CPU name, cores and threads
+    // Method to get CPU name, cores and threads
     func cpu() {
         // Get CPU info from cpuInfo
         cpuInfo = cpuInfo()          
@@ -80,7 +82,7 @@ class SysInfo {
         return cpuInfo
     }
 
-    // Function to get GPU name
+    // Method to get GPU name
     func gpu() {
         // Initialize gpuName
         gpuName = "Unknown"
@@ -133,7 +135,7 @@ class SysInfo {
         return  gpuName
     }
 
-    // Function to get currently running shell
+    // Method to get currently running shell
     func shell() {
         // Get shell info from shellInfo
         shell = shellInfo()
@@ -142,7 +144,7 @@ class SysInfo {
         return shell
     }
 
-    // Function to get currently running terminal info (For Unix-like OSes)
+    // Method to get currently running terminal info (For Unix-like OSes)
     func term() {
         // Initialize term
         term = "Unknown"
@@ -174,34 +176,42 @@ class SysInfo {
         if (isWindows()) {
             // Get Ram info (size, used, free) from winSysInfo
             ramInfo = memoryInfo()
-        else // Else (If the OS is (Unix-like))
-            // Get ramInfo from memoryInfo
-            ramInfo = memoryInfo()
+        elseif (isLinux()) // If the OS is Linux
+            // Get raw memory info
+            memInfo = memoryInfo()
         
-            // Get totalRam and convert the value from KB to GB
-            totalRam = ramInfo[:MemTotal][1] / 1024 / 1024
-
-            // Get freeRam and convert the value from KB to GB
-            freeRam = ramInfo[:MemAvailable][1] / 1024 / 1024
-
-            // Get swapRam and convert the value from KB to GB
-            swapRam = ramInfo[:SwapTotal][1] / 1024 / 1024
+            // Extract memory values in KB and convert to bytes
+            totalBytes = memInfo[:MemTotal][1] * 1024
+            freeBytes = memInfo[:MemAvailable][1] * 1024
+            swapBytes = memInfo[:SwapTotal][1] * 1024
+            usedBytes = totalBytes - freeBytes
             
             // Add size to ramInfo
-            ramInfo[:size] = totalRam
-            // Calculate and add used to ramInfo
-            ramInfo[:used] = totalRam - freeRam
+            ramInfo[:size] = formatBytes(totalBytes)
+            // Add used to ramInfo
+            ramInfo[:used] = formatBytes(usedBytes)
             // Add free to ramInfo
-            ramInfo[:free] = freeRam
+            ramInfo[:free] = formatBytes(freeBytes)
             // Add swap to ramInfo
-            ramInfo[:swap] = swapRam
+            ramInfo[:swap] = formatBytes(swapBytes)
+        elseif (isFreeBSD()) // If the OS is FreeBSD
+            // Get ramInfo from memoryInfo
+            ramInfo = memoryInfo()
+            // Add size to ramInfo
+            ramInfo[:size] = formatBytes(ramInfo[1])
+            // Add free to ramInfo 
+            ramInfo[:free] = formatBytes(ramInfo[2] * ramInfo[3])
+            // Add used to ramInfo
+            ramInfo[:used] = formatBytes(ramInfo[1] - (ramInfo[2] * ramInfo[3]))
+            // Add swap to ramInfo
+            ramInfo[:swap] = formatBytes(ramInfo[4])
         }
                 
         // Return Ram info
         return ramInfo
     }
 
-    // Function to get storage disks info
+    // Method to get storage disks info
     func storageDisks() {
         // Initialize the blockDevices list
         blockDevices = []
@@ -212,7 +222,7 @@ class SysInfo {
         if (isWindows()) {
             // Get storage disks (name, size) from winSysInfo
             storageDisks = winSysInfo[:disks]
-        else // Else (If the OS is (Unix-like))
+        elseif (isLinux()) // If the OS is Linux
             // Get blockdevices from StorageInfo
             blockDevices = storageInfo()
             
@@ -221,13 +231,43 @@ class SysInfo {
                 // Add blockDevice name and size to StorageDisks
                 add(storageDisks, [:name = blockDevice[:name], :size = blockDevice[:size]])
             }
+        elseif (isFreeBSD()) // If the OS is FreeBSD
+            // Use geom to get disk information
+            diskOutput = systemCmd("geom disk list")
+            
+            // Process output and directly extract disk information
+            diskLines = split(diskOutput, nl)
+            currentDisk = ""
+            
+            for line in diskLines {
+                line = trim(line)
+                
+                // Check if this is a disk name line
+                if substr(line, "Geom name:") = 1 {
+                    currentDisk = trim(substr(line, 11))
+                }
+                
+                // Check if this is a disk size line
+                if currentDisk != "" and substr(line, "Mediasize:") = 1 {
+                    // Extract the human-readable size
+                    openParen = substr(line, "(")
+                    closeParen = substr(line, ")")
+                    
+                    if openParen > 0 and closeParen > openParen {
+                        diskSize = trim(substr(line, openParen + 1, closeParen - openParen - 1))
+                        // Add disk to StorageDisks with both name and size
+                        add(storageDisks, [:name = currentDisk, :size = diskSize])
+                        currentDisk = "" // Reset for next disk
+                    }
+                }
+            }        
         }
 
         // Return storage disks
         return storageDisks
     }
 
-    // Function to get storage parts info
+    // Method to get storage parts info
     func storageParts() { 
         // Initialize the blockDevices list
         blockDevices = []
@@ -238,39 +278,39 @@ class SysInfo {
         if (isWindows()) {
             // Get storage parts from winSysInfo (name, size, used, free)
             storageParts = winSysInfo[:parts]
-        else // Else (If the OS is (Unix-like))
-            // Get blockdevices from StorageInfo
-            blockDevices = storageInfo()
-
-            // Loop every blockDevice in blockDevices
-            for blockDevice in blockDevices {
-                // Loop every children in blockDevice (disk part)
-                for children in blockDevice[:children] {
-                    // Check if mountpoint is not null
-                    if (!isNull(children[:mountpoint])) {
-                        // Get partition info
-                        childrenInfo = systemCmd("df -h | grep '" + children[:name] + "' | awk '{print $1, $2, $3, $4}'")
-                        // Split the output into lines
-                        childrenInfo = split(childrenInfo, nl)
-
-                        // Loop through partition info
-                        for info in childrenInfo {
-                            if (!isNull(info)) {
-                                // Split the output
-                                childrenInfoList = split(info, " ")
-
-                                // Get childrenName (part name)
-                                childrenName = childrenInfoList[1]
-                                // Get childrenSize (part size)
-                                childrenSize = childrenInfoList[2]
-                                // Get childrenUsed (part used size)
-                                childrenUsed = childrenInfoList[3]
-                                // Get childrenFree (part free size)
-                                childrenFree = childrenInfoList[4]
-
-                                // Add children (part) to StorageParts
-                                add(storageParts, [:name = childrenName, :size = childrenSize, :used = childrenUsed, :free = childrenFree])
+        else // Else (If the OS is Unix-like)
+            // Get partition information using df
+            partOutput = systemCmd("df -h")
+            // Split the output by newlines
+            partLines = split(partOutput, nl)
+            
+            // Skip the header line
+            for i = 2 to len(partLines) {
+                if (!isNull(partLines[i])) {
+                    // Split the line by spaces
+                    partInfo = split(partLines[i], " ")
+                    // Remove empty elements
+                    partInfo = filter(partInfo, func item { return !isNull(item) })
+                    
+                    if (len(partInfo) >= 6) {
+                        // Get partition details
+                        partName = partInfo[1]
+                        partSize = partInfo[2]
+                        partUsed = partInfo[3]
+                        partFree = partInfo[4]
+                        
+                        // Filter out virtual/temporary filesystems
+                        shouldSkip = false
+                        for filtered in filteredStorageParts {
+                            if (partName = filtered) {
+                                shouldSkip = true
+                                break
                             }
+                        }
+                        
+                        if (!shouldSkip) {
+                            // Add partition to storageParts
+                            add(storageParts, [:name = partName, :size = partSize, :used = partUsed, :free = partFree])
                         }
                     }
                 }
@@ -281,7 +321,7 @@ class SysInfo {
         return storageParts
     }
 
-    // Function to get uptime
+    // Method to get uptime
     func sysUptime(params) {
         // Get calculated uptimeInfo
         fUptime = calcUptime(uptime(), params)
@@ -290,7 +330,7 @@ class SysInfo {
         return fUptime
     }
 
-    // Function to get System Architecture
+    // Method to get System Architecture
     func arch() {
         // Get System Architecture
         sysArch = GetArch()
@@ -299,7 +339,7 @@ class SysInfo {
         return sysArch
     }
 
-    // Function to get Package/Program count
+    // Method to get Package/Program count
     func pCount() {
         // Default pCount value
         pCount = "Unknown"
@@ -322,14 +362,14 @@ class SysInfo {
         return pCount
     }
     
-    // Function to check if the machine is a VM
+    // Method to check if the machine is a VM
     func isVM() {
         // Check if the OS is Windows
         if (isWindows()) {
             isVM = winSysInfo[:isVM]
             
             return isVM
-        else // Else (If the OS is (Unix-like))
+        elseif (isLinux()) // If the OS is Linux
             // Define a list of dmi file paths
             dmiPaths = [
                 "/sys/class/dmi/id/product_name",
@@ -347,10 +387,24 @@ class SysInfo {
                     dmiContent = split(readFile(path), nl)
                     // Loop through the list of known virtualization indicators
                     for indicator in virtIndicators {
-                        if (dmiContent[1] = indicator) {
+                        if (lower(dmiContent[1]) = lower(indicator)) {
                             // Return true if a match is found
                             return true
                         }
+                    }
+                }
+            }
+        elseif (isFreeBSD()) // If the OS is FreeBSD
+            // Check if the system is running in a VM
+            vmInfo = systemCmd("sysctl -n kern.vm_guest")
+
+            // Check if the VM info is not null
+            if (!isNull(vmInfo)) {
+                // Loop through the list of known virtualization indicators
+                for indicator in virtIndicators {
+                    if (lower(vmInfo) = lower(indicator)) {
+                        // Return true if a match is found
+                        return true
                     }
                 }
             }
@@ -360,9 +414,18 @@ class SysInfo {
         return false
     }
 
+    // Method to get network interface information
+    func network() {
+        // Get network info from networkInfo
+        networkInfo = networkInfo()
+
+        // Return the network list
+        return networkInfo
+    }
+
     private
 
-    // Function to get osInfo
+    // Helper function to get osInfo
     func osInfo() {
         // Initialize the OS info list
         osInfo = [
@@ -405,7 +468,7 @@ class SysInfo {
         return osInfo
     }
 
-    // Function to get Kernel info
+    // Helper function to get Kernel info
     func kernelInfo() {
         // kVersion default value
         kVersion = "Unknown"
@@ -414,7 +477,7 @@ class SysInfo {
         if (isWindows()) {
             // Get Windows NT Kernel version from winSysInfo
             kVersion = winSysInfo[:version]
-        else // Else (If the OS is (Unix-like))
+        elseif (isLinux()) // If the OS is Linux
             // Read and get the Kernel info from /proc/version
             kInfo = readFile("/proc/version")
             
@@ -429,13 +492,23 @@ class SysInfo {
                     kVersion = left(vSubstring, vEndIndex - 1)
                 }
             }
+        elseif (isFreeBSD()) // If the OS is FreeBSD
+            // Get the Kernel version using sysctl
+            kInfo = systemCmd("sysctl kern.osrelease")
+            // Split the output by ":"
+            kInfo = split(kInfo, ":")
+            // Check if the length of kInfo is greater than 1
+            if (len(kInfo) > 1) {
+                // Get the kernel version
+                kVersion = trim(kInfo[2])
+            }
         }
 
         // Return Windows NT Kernel version
         return kVersion
     }
 
-    // Function to get CPU info
+    // Helper function to get CPU info
     func cpuInfo() {
         // Initialize the CPU info list
         cpuInfo = [
@@ -452,7 +525,7 @@ class SysInfo {
         if (isWindows()) {
             // Get CPU info from the winSysInfo list
             cpuInfo = winSysInfo[:cpu]
-        else // Else (If the OS is (Unix-like))
+        elseif (isLinux()) // If the OS is Linux
             // Read and get CPU info content
             content = readFile("/proc/cpuinfo")
             
@@ -560,13 +633,76 @@ class SysInfo {
             else // If tempFile doesn't exist
                 cpuInfo[:temp] = NULL
             }
+        
+        elseif (isFreeBSD()) // If the OS is FreeBSD
+            // Get CPU info using sysctl
+            cpuOutput = systemCmd("sysctl -n hw.model hw.ncpu")
+            // Split the output by newlines
+            cpuLines = split(cpuOutput, nl)
+            // Check if we have at least 2 lines of output
+            if (len(cpuLines) >= 2) {
+                // Get the CPU model name
+                cpuInfo[:model] = trim(cpuLines[1])
+                // Get the number of CPUs
+                cpuCount = number(trim(cpuLines[2]))
+                cpuInfo[:count] = cpuCount
+                // Set the number of cores and threads to the same value
+                cpuInfo[:cores] = string(cpuCount)
+                cpuInfo[:threads] = string(cpuCount)
+                
+                // Initialize CPU specific info
+                cpuInfo[:cpus] = []
+                add(cpuInfo[:cpus], [
+                    :number = 1,
+                    :model = cpuInfo[:model],
+                    :cores = cpuInfo[:cores],
+                    :threads = cpuInfo[:threads]
+                ])
+            }
+            
+            // Get CPU usage
+            // Get initial CPU stats
+            initialStats = systemCmd("sysctl -n kern.cp_time")
+            initialStats = split(initialStats, " ")
+            
+            // Sleep for 0.1 seconds (to update the CPU stats)
+            sleep(0.1)
+            
+            // Get updated CPU stats after the sleep period
+            updatedStats = systemCmd("sysctl -n kern.cp_time")
+            updatedStats = split(updatedStats, " ")
+            
+            // Convert string values to numbers and calculate differences
+            diffs = []
+            totalDiff = 0
+            for i = 1 to len(initialStats) {
+                diffValue = number(updatedStats[i]) - number(initialStats[i])
+                add(diffs, diffValue)
+                totalDiff += diffValue
+            }
+            
+            // Calculate CPU usage (in FreeBSD, the last value is idle time)
+            idleIndex = len(diffs)
+            if (totalDiff > 0) {
+                cpuInfo[:usage] = 100 * (totalDiff - diffs[idleIndex]) / totalDiff
+            else
+                cpuInfo[:usage] = 0
+            }
+            
+            // Check if the system is not a VM
+            if (!isVM()) {
+                tempInfo = systemCmd("sysctl -n dev.cpu.0.temperature")
+                if (!isNull(tempInfo)) {
+                    cpuInfo[:temp] = number(substr(tempInfo, 1, len(tempInfo) - 2))
+                }
+            }
         }
 
         // Return the CPU info list
         return cpuInfo
     }
 
-    // Function to get shell info
+    // Helper function to get shell info
     func shellInfo() {
         // Initialize the shell list with default values
         shell = [
@@ -624,7 +760,7 @@ class SysInfo {
         return shell
     }
 
-    // Function to get Memory info
+    // Helper function to get Memory info
     func memoryInfo() {
         // Initialize the memInfo list
         memInfo = []
@@ -633,7 +769,7 @@ class SysInfo {
         if (isWindows()) {
             // Get Ram info (size, used, free) from winSysInfo
             memInfo = winSysInfo[:ram]
-        else // Else (If the OS is (Unix-like))
+        elseif (isLinux()) // If the OS is Linux
             // Read and get meminfo 
             content = readFile("/proc/meminfo")
 
@@ -648,16 +784,40 @@ class SysInfo {
                     key = trim(left(line, colonPos - 1))
                     valueStr = trim(right(line, len(line) - colonPos))
             
-                    // Split the value string into value
+                    // Split the value string into value and unit
                     spacePos = substr(valueStr, " ")
                     if (spacePos > 0) {
                         value = number(left(valueStr, spacePos - 1))
+                        unit = trim(right(valueStr, len(valueStr) - spacePos))
+                        // Store raw KB values for formatting later
+                        memInfo[key] = [value, unit]
                     else
                         value = number(valueStr)
+                        memInfo[key] = [value]
                     }
-                        
-                    memInfo[key] = [value]
                 }
+            }
+        elseif (isFreeBSD()) // If the OS is FreeBSD
+            // Get memory info using sysctl
+            memInfoRaw = systemCmd("sysctl -n hw.physmem vm.stats.vm.v_free_count vm.stats.vm.v_page_size vm.swap_total")
+            // Split the output by newlines
+            memInfoLines = split(memInfoRaw, nl)
+            
+            // Process FreeBSD memory info - store raw values
+            if (len(memInfoLines) >= 4) {
+                physmem = number(memInfoLines[1])
+                freeCount = number(memInfoLines[2])
+                pageSize = number(memInfoLines[3])
+                swapTotal = number(memInfoLines[4])
+                
+                memInfo = [
+                    physmem,
+                    freeCount,
+                    pageSize,
+                    swapTotal
+                ]
+            else
+                memInfo = split(memInfoRaw, nl)
             }
         }
 
@@ -666,7 +826,7 @@ class SysInfo {
         return memInfo
     }
     
-    // Function to calculate uptime based on uptimeInfo and the given params list
+    // Helper function to calculate uptime based on uptimeInfo and the given params list
     func calcUptime(uptimeInfo, params) {
         // Set default parameter values if not provided, not a list, or the list is empty
         if (!isList(params) or len(params) = 0) {
@@ -698,7 +858,7 @@ class SysInfo {
         return fUptime
     }
 
-    // Function to get Storage Info (For Unix-like OSes)
+    // Helper function to get Storage Info (For Linux)
     func storageInfo() {
         // Initialize the blockDevices list
         blockDevices = []
@@ -721,7 +881,181 @@ class SysInfo {
         return blockDevices
     }
 
-    // Function to read the contents of a file
+    // Helper function to get network interface information
+    func networkInfo() {
+        // Initialize the networkInfo list
+        networkInfo = []
+
+        // Check if the OS is Windows
+        if (isWindows()) {
+            // Get network info from winSysInfo
+            networkInfo = winSysInfo[:network]
+        elseif (isLinux()) // If the OS is Linux
+            // Get network interfaces using ip command
+            try {
+                // Check if ip command is available
+                result = systemCmd("which ip")
+                if (isNull(result)) {
+                    // Fallback to ifconfig
+                    interfaceOutput = systemCmd("ifconfig")
+                    networkInfo = parseIfconfig(interfaceOutput)
+                else
+                    // Use ip command for better output
+                    interfaceOutput = systemCmd("ip -o addr show")
+                    networkInfo = parseIpAddr(interfaceOutput)
+                }
+            catch
+                // Return empty list on error
+                return []
+            }
+        elseif (isFreeBSD()) // If the OS is FreeBSD
+            // Use ifconfig for FreeBSD
+            try {
+                interfaceOutput = systemCmd("ifconfig")
+                networkInfo = parseIfconfig(interfaceOutput)
+            catch
+                // Return empty list on error
+                return []
+            }
+        }
+
+        // Return network interface information
+        return networkInfo
+    }
+
+    // Helper function to parse ip addr output (Linux)
+    func parseIpAddr(output) {
+        // Initialize interfaces list
+        interfaces = []
+        
+        // Split output by lines
+        lines = split(output, nl)
+        
+        for line in lines {
+            if (!isNull(line) and len(trim(line)) > 0) {
+                // Parse each line of ip addr output
+                parts = split(line, " ")
+                
+                if (len(parts) >= 4) {
+                    interfaceIndex = parts[1]
+                    interfaceName = substr(parts[2], 1, len(parts[2]) - 1) // Remove trailing colon
+                    
+                    // Skip if not an inet address
+                    if (parts[3] != "inet") {
+                        loop
+                    }
+                    
+                    ipWithMask = parts[4]
+                    ipParts = split(ipWithMask, "/")
+                    ipAddress = ipParts[1]
+                    
+                    // Skip loopback unless it's the only interface
+                    if (interfaceName = "lo" and len(interfaces) > 0) {
+                        loop
+                    }
+                    
+                    // Check if interface already exists in our list
+                    found = false
+                    for i = 1 to len(interfaces) {
+                        if (interfaces[i][:name] = interfaceName) {
+                            found = true
+                            break
+                        }
+                    }
+                    
+                    if (!found) {
+                        add(interfaces, [
+                            :name = interfaceName,
+                            :ip = ipAddress,
+                            :status = "up"
+                        ])
+                    }
+                }
+            }
+        }
+        
+        return interfaces
+    }
+
+    // Helper function to parse ifconfig output (For Unix-like OSes)
+    func parseIfconfig(output) {
+        interfaces = []
+        lines = split(output, nl)
+        currentInterface = ""
+        currentIP = ""
+        
+        for raw_line in lines {
+            trimmed_line = trim(raw_line)
+            
+            if (!len(trimmed_line)) {
+                loop
+            }
+            
+            // Check if this is a new interface line
+            isInterfaceLine = false
+            if (substr(raw_line, 1, 1) != " ") { // Check indentation on raw_line
+                colonPos = substr(trimmed_line, ":")
+                if (colonPos > 0) {
+                    potentialName = left(trimmed_line, colonPos - 1)
+                    // Ensure potentialName is a valid interface name (no spaces, not a keyword)
+                    if (len(potentialName) > 0 and !substr(potentialName, " ")) {
+                        if lower(potentialName) != "status" and lower(potentialName) != "media" and lower(potentialName) != "options" and lower(potentialName) != "ether" and lower(potentialName) != "groups" {
+                           isInterfaceLine = true
+                        }
+                    }
+                }
+            }
+
+            if (isInterfaceLine) {
+                if (currentInterface != "" and currentIP != "") {
+                    add(interfaces, [
+                        :name = currentInterface,
+                        :ip = currentIP,
+                        :status = "up"
+                    ])
+                }
+                
+                colonPos = substr(trimmed_line, ":") 
+                currentInterface = left(trimmed_line, colonPos - 1)
+                currentIP = ""
+            
+            elseif (currentInterface != "" and (substr(trimmed_line, "inet ") or substr(trimmed_line, "inet addr:")))
+                ipLineContent = ""
+                if (substr(trimmed_line, "inet addr:")) {
+                    ipLineContent = trim(substr(trimmed_line, substr(trimmed_line, "inet addr:") + len("inet addr:")))
+                elseif (substr(trimmed_line, "inet "))
+                    ipLineContent = trim(substr(trimmed_line, substr(trimmed_line, "inet ") + len("inet ")))
+                }
+
+                if (ipLineContent != "") {
+                    tempIP = ""
+                    spacePos = substr(ipLineContent, " ")
+                    if (spacePos > 0) {
+                        tempIP = left(ipLineContent, spacePos - 1)
+                    else
+                        tempIP = ipLineContent
+                    }
+                    
+                    if (!substr(tempIP, ":") and currentIP = "") {
+                        currentIP = tempIP
+                    }
+                }
+            }
+        }
+        
+        // Add the last interface found, if it has an IP
+        if (currentInterface != "" and currentIP != "") {
+            add(interfaces, [
+                :name = currentInterface,
+                :ip = currentIP,
+                :status = "up"
+            ])
+        }
+        
+        return interfaces
+    }
+    
+    // Helper function to read the contents of a file
     func readFile(file) {
         // Open the specified file in read-only mode
         fp = fopen(file, "r")
@@ -732,5 +1066,32 @@ class SysInfo {
 
         // Return the contents from the file
         return result
+    }
+
+    // Helper function to format bytes into appropriate units
+    func formatBytes(bytes) {
+        // Handle null values
+        if (isNull(bytes)) {
+            return 0
+        }
+        
+        // Convert to number if it's a string
+        numBytes = 0
+        if (isString(bytes)) {
+            numBytes = number(bytes)
+        else
+            numBytes = bytes
+        }
+        
+        // Handle zero or negative values
+        if (numBytes <= 0) {
+            return 0
+        }
+        
+        // Convert to MB and round to 2 decimal places
+        mbValue = numBytes / 1024 / 1024
+        
+        // Return the numeric value only
+        return floor(mbValue * 100) / 100
     }
 }
