@@ -1,4 +1,4 @@
-# SysInfo Library Documentation
+# SysInfo Package Documentation
 
 ## Usage
 

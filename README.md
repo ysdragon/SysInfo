@@ -25,6 +25,7 @@ SysInfo is a powerful Ring package that provides easy access to essential system
 - Storage devices and partition info
 - System uptime tracking
 - Virtual machine detection
+- Network interface details
 
 ### Environment Details
 - Shell identification and version
@@ -74,7 +75,7 @@ sys = new SysInfo
 ? "Total RAM: " + (sys.ram()[:size] / 1024) + " GB"
 ```
 
-For detailed API documentation, please refer to the [SysInfo Library Documentation](./docs/API.md).
+For detailed API documentation, please refer to the [SysInfo Package Documentation](./docs/API.md).
 
 ## Example
 Check out ***[RingFetch](https://github.com/ysdragon/SysInfo/tree/main/examples)***, a complete system information display tool built with SysInfo.
