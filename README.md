@@ -33,7 +33,7 @@ SysInfo is a powerful Ring package that provides easy access to essential system
 - System architecture detection
 
 ### Cross-Platform Support
-- Linux/Unix/Windows support
+- Linux/FreeBSD/Windows support
 
 
 ## Installation
