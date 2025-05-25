@@ -27,8 +27,10 @@ aPackageInfo = [
 		"examples/RingFetch.ring",
 		"examples/RingFetch_GUI.ring",
 		"tests/SysInfo_test.ring",
-		"LICENSE",
-		"README.md"
+		"README.md",
+		"docs/API.md",
+		"docs/Usage.md",
+		"LICENSE"
 	],
 	:ringfolderfiles = 	[
 
