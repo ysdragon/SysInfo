@@ -248,7 +248,7 @@ class SysInfo {
                 }
                 
                 // Check if this is a disk size line
-                if currentDisk != "" and substr(line, "Mediasize:") = 1 {
+                if !isNull(currentDisk) and substr(line, "Mediasize:") = 1 {
                     // Extract the human-readable size
                     openParen = substr(line, "(")
                     closeParen = substr(line, ")")
@@ -937,7 +937,7 @@ class SysInfo {
         return networkInfo
     }
 
-    // Helper function to parse ip addr output (Linux)
+    // Helper function to parse ip addr output (For Linux)
     func parseIpAddr(output) {
         // Initialize interfaces list
         interfaces = []
@@ -952,7 +952,8 @@ class SysInfo {
                 
                 if (len(parts) >= 4) {
                     interfaceIndex = parts[1]
-                    interfaceName = substr(parts[2], 1, len(parts[2]) - 1) // Remove trailing colon
+                    // Remove trailing colon
+                    interfaceName = substr(parts[2], 1, len(parts[2]) - 1)
                     
                     // Skip if not an inet address
                     if (parts[3] != "inet") {
@@ -991,7 +992,7 @@ class SysInfo {
         return interfaces
     }
 
-    // Helper function to parse ifconfig output (For Unix-like OSes)
+    // Helper function to parse ifconfig output (For FreeBSD and Linux)
     func parseIfconfig(output) {
         interfaces = []
         lines = split(output, nl)
@@ -1007,11 +1008,12 @@ class SysInfo {
             
             // Check if this is a new interface line
             isInterfaceLine = false
-            if (substr(raw_line, 1, 1) != " ") { // Check indentation on raw_line
+            // Check indentation on raw_line
+            if (substr(raw_line, 1, 1) != " ") {
                 colonPos = substr(trimmed_line, ":")
                 if (colonPos > 0) {
                     potentialName = left(trimmed_line, colonPos - 1)
-                    // Ensure potentialName is a valid interface name (no spaces, not a keyword)
+                    // Ensure potentialName is a valid interface name
                     if (len(potentialName) > 0 and !substr(potentialName, " ")) {
                         if lower(potentialName) != "status" and lower(potentialName) != "media" and lower(potentialName) != "options" and lower(potentialName) != "ether" and lower(potentialName) != "groups" {
                            isInterfaceLine = true
@@ -1021,7 +1023,7 @@ class SysInfo {
             }
 
             if (isInterfaceLine) {
-                if (currentInterface != "" and currentIP != "") {
+                if (!isNull(currentInterface) and !isNull(currentIP)) {
                     add(interfaces, [
                         :name = currentInterface,
                         :ip = currentIP,
@@ -1033,7 +1035,7 @@ class SysInfo {
                 currentInterface = left(trimmed_line, colonPos - 1)
                 currentIP = ""
             
-            elseif (currentInterface != "" and (substr(trimmed_line, "inet ") or substr(trimmed_line, "inet addr:")))
+            elseif (!isNull(currentInterface) and (substr(trimmed_line, "inet ") or substr(trimmed_line, "inet addr:")))
                 ipLineContent = ""
                 if (substr(trimmed_line, "inet addr:")) {
                     ipLineContent = trim(substr(trimmed_line, substr(trimmed_line, "inet addr:") + len("inet addr:")))
@@ -1041,7 +1043,7 @@ class SysInfo {
                     ipLineContent = trim(substr(trimmed_line, substr(trimmed_line, "inet ") + len("inet ")))
                 }
 
-                if (ipLineContent != "") {
+                if (!isNull(ipLineContent)) {
                     tempIP = ""
                     spacePos = substr(ipLineContent, " ")
                     if (spacePos > 0) {
@@ -1058,7 +1060,7 @@ class SysInfo {
         }
         
         // Add the last interface found, if it has an IP
-        if (currentInterface != "" and currentIP != "") {
+        if (!isNull(currentInterface) and !isNull(currentIP)) {
             add(interfaces, [
                 :name = currentInterface,
                 :ip = currentIP,
