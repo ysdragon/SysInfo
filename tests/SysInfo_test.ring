@@ -2,7 +2,7 @@
     SysInfo Package Test Suite
 */
 
-load "SysInfo.ring"
+load "../lib.ring"
 
 func main() {
     tests = new SysInfoTest()
@@ -40,6 +40,7 @@ class SysInfoTest {
         testArch()
         testPCount()
         testIsVM()
+        testNetwork()
         
         ? "All tests completed successfully!"
     }
@@ -92,8 +93,9 @@ class SysInfoTest {
         assert(number(firstCPU[:cores]) > 0, "CPU specific cores should be greater than 0")
         assert(number(firstCPU[:threads]) > 0, "CPU specific threads should be greater than 0")
 
-        // CPU temperature may be null in VMs, so we only check if it's null or a number
-        assert(isNull(cpuInfo[:temp]) or number(cpuInfo[:temp]) >= 0, "CPU temperature should be null or non-negative")
+        if (!sysInfo.isVM()) {
+            assert(isNull(cpuInfo[:temp]) or (type(cpuInfo[:temp]) = "NUMBER" and cpuInfo[:temp] >= 20 and cpuInfo[:temp] <= 100), "CPU temperature should be null or between 20-100°C")
+        }
     }
 
     func testGPU() {
@@ -180,6 +182,19 @@ class SysInfoTest {
         ? "Testing isVM()..."
         isVM = sysInfo.isVM()
         assert(isBoolean(isVM) or isNull(isVM), "isVM should be boolean or null")
+    }
+
+    func testNetwork() {
+        ? "Testing network()..."
+        networkInfo = sysInfo.network()
+        assert(isList(networkInfo), "Network info should be a list")
+        
+        if (len(networkInfo) > 0) {
+            firstInterface = networkInfo[1]
+            assert(!isNull(firstInterface[:name]), "Interface name should not be null")
+            assert(!isNull(firstInterface[:ip]), "Interface IP should not be null")
+            assert(!isNull(firstInterface[:status]), "Interface status should not be null")
+        }
     }
 
     // Helper function to check if value is boolean
