@@ -80,10 +80,10 @@ For detailed API documentation, please refer to the [SysInfo Package Documentati
 ## Example
 Check out ***[RingFetch](https://github.com/ysdragon/SysInfo/tree/main/examples)***, a complete system information display tool built with SysInfo.
 
-|*RingFetch on a Linux VM*                                                                                   | *RingFetch on a Windows VM*                                                                           |
-|-----------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-|  ![](examples/img//ringfetch_linux.png)                                      |  ![](examples/img/ringfetch_win.png)                               |
-                                                      
+|*RingFetch on a Linux VM*                                                                                   | *RingFetch on a Windows VM*                                                                           | *RingFetch on a FreeBSD VM*                                                                           |
+|-----------------------------------------------------------------------------------|----------------------------------------------------------------------------|----------------------------------------------------------------------------|
+|  ![](examples/img//ringfetch_linux.png)                                      |  ![](examples/img/ringfetch_win.png)                               |  ![](examples/img/ringfetch_freebsd.png)                               |
+                                      
 
 ## Supported Operating Systems
 ### Fully Tested
