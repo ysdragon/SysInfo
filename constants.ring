@@ -42,33 +42,41 @@ foreach ($GPU in $GPU_INFO) {
     }
 }
 $OS = (Get-CimInstance -Query 'SELECT Caption, Version, FreePhysicalMemory FROM Win32_OperatingSystem')
-$TOTAL_RAM = [math]::round((Get-CimInstance -Query 'SELECT Capacity FROM Win32_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1GB, 2)
+$TOTAL_RAM = [math]::round((Get-CimInstance -Query 'SELECT Capacity FROM Win32_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1MB, 2)
 $PAGE_FILES = Get-CimInstance -Class Win32_PageFileUsage
-$FREE_RAM = [math]::round($OS.FreePhysicalMemory / 1MB, 2)
+$FREE_RAM = [math]::round($OS.FreePhysicalMemory / 1KB, 2)
 $USED_RAM = [math]::round($TOTAL_RAM - $FREE_RAM, 2)
-$TOTAL_SWAP = [math]::round((($PAGE_FILES | Measure-Object -Property AllocatedBaseSize -Sum).Sum) / 1024, 2)
+$TOTAL_SWAP = [math]::round((($PAGE_FILES | Measure-Object -Property AllocatedBaseSize -Sum).Sum), 2)
 $RAM = @{
     size = $TOTAL_RAM
     used = $USED_RAM
     free = $FREE_RAM
     swap = $TOTAL_SWAP
 }
+function Format-Size($bytes) {
+    if ($bytes -ge 1TB) { return [math]::round($bytes / 1TB, 2).ToString() + 'T' }
+    elseif ($bytes -ge 1GB) { return [math]::round($bytes / 1GB, 2).ToString() + 'G' }
+    elseif ($bytes -ge 1MB) { return [math]::round($bytes / 1MB, 2).ToString() + 'M' }
+    elseif ($bytes -ge 1KB) { return [math]::round($bytes / 1KB, 2).ToString() + 'K' }
+    else { return $bytes.ToString() + 'B' }
+}
 $DISKS_RAW = Get-CimInstance -Query 'SELECT Size, DeviceID, Model FROM Win32_DiskDrive'
 $DISKS = @()
 foreach ($DISK in $DISKS_RAW) {
     $DISKS += @{
         name = $DISK.Model
-        size = [math]::round($DISK.Size / 1GB, 2).ToString() + 'G'
+        size = Format-Size $DISK.Size
     }
 }
 $PARTS_RAW = (Get-CimInstance -Query 'SELECT Size, FreeSpace, Caption FROM Win32_LogicalDisk WHERE DriveType=3')
 $PARTS = @()
 foreach ($PART in $PARTS_RAW) {
+    $usedBytes = $PART.Size - $PART.FreeSpace
     $PARTS += @{
         name = $PART.Caption
-        size = [math]::round($PART.Size / 1GB, 2).ToString() + 'G'
-        used = ([math]::round($PART.Size / 1GB, 2) - [math]::round($PART.FreeSpace / 1GB, 2)).ToString() + 'G'
-        free = [math]::round($PART.FreeSpace / 1GB, 2).ToString() + 'G'
+        size = Format-Size $PART.Size
+        used = Format-Size $usedBytes
+        free = Format-Size $PART.FreeSpace
     }
 }
 $PCOUNT = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\* | Measure-Object).Count
@@ -77,6 +85,17 @@ $SHELL_VERSION = $PSVersionTable.PSVersion.ToString()
 $SHELL = @{
     name = $SHELL_NAME
     version = $SHELL_VERSION
+}
+$NETWORK_RAW = Get-CimInstance -ClassName Win32_NetworkAdapterConfiguration | Where-Object { $_.IPEnabled -eq $true -and $_.IPAddress }
+$NETWORK = @()
+foreach ($NET in $NETWORK_RAW) {
+    if ($NET.IPAddress -and $NET.IPAddress.Count -gt 0) {
+        $NETWORK += @{
+            name = $NET.Description
+            ip = $NET.IPAddress[0]
+            status = "up"
+        }
+    }
 }
 $isVM = [int]((Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer -match 'Microsoft Corporation|VMware|Xen|KVM|VirtualBox|QEMU')
 $Result = @{
@@ -89,6 +108,7 @@ $Result = @{
     parts = $PARTS
     pcount = $PCOUNT
     shell = $SHELL
+    network = $NETWORK
     isVM = $isVM
 }
 Write-Output (ConvertTo-Json $Result -Depth 4)`
@@ -134,4 +154,32 @@ virtIndicators = [
     "Hyper-V",
     "Apple Virtualization",
     "Google Compute Engine"
+]
+
+// Storage parts to filter out (temporary filesystems, virtual filesystems, etc.)
+filteredStorageParts = [
+    "tmpfs",
+    "devtmpfs", 
+    "dev",
+    "run",
+    "shm",
+    "proc",
+    "sys",
+    "sysfs",
+    "devpts",
+    "securityfs",
+    "debugfs",
+    "mqueue",
+    "hugetlbfs",
+    "efivarfs",
+    "binfmt_misc",
+    "autofs",
+    "configfs",
+    "fusectl",
+    "pstore",
+    "cgroup",
+    "cgroup2",
+    "none",
+    "overlay",
+    "squashfs"
 ]
