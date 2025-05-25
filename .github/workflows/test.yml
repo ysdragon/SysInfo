@@ -1,5 +1,10 @@
 name: Test CI
-on: [push]
+on:
+  push:
+    paths:
+      - 'tests/SysInfo_test.ring'
+      - 'lib.ring'
+      - 'constants.ring'
 
 jobs:
   test:
