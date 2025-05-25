@@ -334,6 +334,20 @@ class SysInfo {
     func arch() {
         // Get System Architecture
         sysArch = GetArch()
+        
+        // Standardize architecture naming across different OS
+        switch (sysArch) {
+            case "x64"
+                sysArch = "amd64"
+            case "x86"
+                sysArch = "i386"
+            case "arm64"
+                sysArch = "aarch64"
+            case "arm"
+                sysArch = "armv7l"
+            else
+                sysArch = "unknown"
+        }
 
         // Return System Architecture
         return sysArch
