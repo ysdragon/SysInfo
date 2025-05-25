@@ -189,16 +189,16 @@ func main() {
     memForm = uiNewForm()
     uiFormSetPadded(memForm, 1)
     uiBoxAppend(memBox, uiControl(memForm), 0)
-    uiFormAppend(memForm, "Total RAM (MB):", uiControl(uiNewLabel(formatMemoryValue(totalRam))), 0)
-    uiFormAppend(memForm, "Used RAM (MB):", uiControl(uiNewLabel(formatMemoryValue(usedRam))), 0)
-    uiFormAppend(memForm, "Free RAM (MB):", uiControl(uiNewLabel(formatMemoryValue(freeRam))), 0)
+    uiFormAppend(memForm, "Total RAM (MB):", uiControl(uiNewLabel(formatMemory(totalRam))), 0)
+    uiFormAppend(memForm, "Used RAM (MB):", uiControl(uiNewLabel(formatMemory(usedRam))), 0)
+    uiFormAppend(memForm, "Free RAM (MB):", uiControl(uiNewLabel(formatMemory(freeRam))), 0)
     
     // Display swap/pagefile based on operating system
     swapLabel = "Swap (MB):"
     if (isWindows()) {
         swapLabel = "Pagefile (MB):"
     }
-    uiFormAppend(memForm, swapLabel, uiControl(uiNewLabel(formatMemoryValue(swapRam))), 0)
+    uiFormAppend(memForm, swapLabel, uiControl(uiNewLabel(formatMemory(swapRam))), 0)
 
     uiGroupSetChild(memGroup, uiControl(memBox))
     uiBoxAppend(hwPage, uiControl(memGroup), 0)
@@ -352,23 +352,24 @@ func main() {
 }
 
 // ===========================================
-// UTILITY FUNCTIONS
+// HELPER FUNCTIONS
 // ===========================================
 
-/*
-    Format memory values for display
-    Handles null values and provides proper formatting
-*/
-func formatMemoryValue(value) {
-    if (isNull(value)) {
-        return "N/A"
+// Helper function to format memory values with size formatting
+func formatMemory(value)
+    // Check if value is not a number and convert it to a number
+    if (!isNumber(value)) {
+        value = number(value)
     }
-    try {
+
+    // Format memory size in KB, MB, or GB based on value
+    if (value < 1) {
+        return string(value * 1024) + " KB"
+    elseif (value < 1024)
         return string(value) + " MB"
-    catch
-        return "Error"
+    else
+        return string(value / 1024) + " GB"
     }
-}
 
 /*
     Window closing event handler

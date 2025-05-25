@@ -94,18 +94,18 @@ gpu = sys.gpu()
 // ===========================================
 
 // Retrieve memory statistics (all values in MB for RAM)
-totalRam = sys.ram()[:size]  // Total installed RAM
-usedRam = sys.ram()[:used]   // Currently used RAM
-freeRam = sys.ram()[:free]   // Available free RAM
+totalRam = formatMemory(sys.ram()[:size])  // Total installed RAM
+usedRam = formatMemory(sys.ram()[:used])   // Currently used RAM
+freeRam = formatMemory(sys.ram()[:free])   // Available free RAM
 
 // Handle swap/pagefile information based on operating system
 swapRam = NULL
 if (isWindows()) {
     // Windows uses pagefile for virtual memory
-    swapRam = "Pagefile: " + sys.ram()[:swap]
+    swapRam = "Pagefile: " + formatMemory(sys.ram()[:swap])
 elseif (isUnix())
     // Unix-like systems use swap partitions/files
-    swapRam = "Swap: " + sys.ram()[:swap]
+    swapRam = "Swap: " + formatMemory(sys.ram()[:swap])
 }
 
 // ===========================================
@@ -212,3 +212,23 @@ if (isList(networkInfo) and len(networkInfo) > 0) {
 else
     print("             No network interfaces detected\n")
 }
+
+// ===========================================
+// HELPER FUNCTIONS
+// ===========================================
+
+// Helper function to format memory values with size formatting
+func formatMemory(value)
+    // Check if value is not a number and convert it to a number
+    if (!isNumber(value)) {
+        value = number(value)
+    }
+
+    // Format memory size in KB, MB, or GB based on value
+    if (value < 1) {
+        return string(value * 1024) + " KB"
+    elseif (value < 1024)
+        return string(value) + " MB"
+    else
+        return string(value / 1024) + " GB"
+    }
