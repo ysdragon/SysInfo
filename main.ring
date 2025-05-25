@@ -18,7 +18,7 @@ func main() {
         ? "OS: " + sys.os()[:name]
         ? "Hostname: " + sys.hostname()
         ? "CPU: " + sys.cpu()[:model]
-        ? "Total RAM: " + sys.ram()[:size] + " GB"
+        ? "Total RAM: " + (sys.ram()[:size] / 1024) + " GB"
 
         // A complete good example can be found in the package's examples folder.
 	\n`)
