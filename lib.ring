@@ -734,11 +734,20 @@ class SysInfo {
             shellInfo = SysGet("SHELL")
             // Get shell name only from its path e.g. /usr/bin/fish --> fish
             shell[:name] = JustFileName(shellInfo)
-            // Execute the shell with the version argument to retrieve the shell version
-            shellVersion = systemCmd(shellInfo + " --version")
+            // Initialize shellVersion
+            shellVersion = "Unknown"
+            // Skip version check for sh and dash shells since they don't support --version
+            if !(shell[:name] = "sh" or shell[:name] = "dash") {
+                // Execute the shell with the version argument to retrieve the shell version
+                shellVersion = systemCmd(shellInfo + " --version")
+            }
 
             // Switch statement to determine the shell type and extract its version
             switch shell[:name] {
+                case "sh"
+                    shell[:version] = systemCmd("strings $(which dash) | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1")
+                case "dash"
+                    shell[:version] = systemCmd("strings $(which dash) | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1")
                 case "bash"
                     // Find the position of the version number in the shellVersion string
                     versionPos = substr(shellVersion, "version ") + len("version ")
