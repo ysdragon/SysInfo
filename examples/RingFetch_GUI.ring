@@ -39,7 +39,7 @@ func main() {
     cpuThreads = string(sys.cpu()[:threads])
     cpuUsage = string(sys.cpu()[:usage]) + "%"
 
-    // Memory statistics (all values in MB)
+    // Memory statistics
     totalRam = sys.ram()[:size]
     usedRam = sys.ram()[:used]
     freeRam = sys.ram()[:free]
@@ -185,18 +185,19 @@ func main() {
     memBox = uiNewVerticalBox()
     uiBoxSetPadded(memBox, 1)
 
-    // Memory statistics form (all values in MB)
+    // Memory statistics form
     memForm = uiNewForm()
     uiFormSetPadded(memForm, 1)
     uiBoxAppend(memBox, uiControl(memForm), 0)
-    uiFormAppend(memForm, "Total RAM (MB):", uiControl(uiNewLabel(formatMemory(totalRam))), 0)
-    uiFormAppend(memForm, "Used RAM (MB):", uiControl(uiNewLabel(formatMemory(usedRam))), 0)
-    uiFormAppend(memForm, "Free RAM (MB):", uiControl(uiNewLabel(formatMemory(freeRam))), 0)
+    uiFormAppend(memForm, "Total RAM:", uiControl(uiNewLabel(formatMemory(totalRam))), 0)
+    uiFormAppend(memForm, "Used RAM:", uiControl(uiNewLabel(formatMemory(usedRam))), 0)
+    uiFormAppend(memForm, "Free RAM:", uiControl(uiNewLabel(formatMemory(freeRam))), 0)
     
     // Display swap/pagefile based on operating system
-    swapLabel = "Swap (MB):"
     if (isWindows()) {
-        swapLabel = "Pagefile (MB):"
+        swapLabel = "Pagefile:"
+    else
+        swapLabel = "Swap:"
     }
     uiFormAppend(memForm, swapLabel, uiControl(uiNewLabel(formatMemory(swapRam))), 0)
 
@@ -335,7 +336,7 @@ func main() {
     footerGroup = uiNewGroup("")
     footerBox = uiNewHorizontalBox()
     uiBoxSetPadded(footerBox, 1)
-    creditsLabel = uiNewLabel("© 2024 RingFetch GUI | Created by ysdragon")
+    creditsLabel = uiNewLabel("© 2025 RingFetch GUI | Created by ysdragon")
     githubLabel = uiNewLabel("github.com/ysdragon/SysInfo")
     uiBoxAppend(footerBox, uiControl(creditsLabel), 1)
     uiBoxAppend(footerBox, uiControl(githubLabel), 0)
@@ -356,7 +357,7 @@ func main() {
 // ===========================================
 
 // Helper function to format memory values with size formatting
-func formatMemory(value)
+func formatMemory(value) {
     // Check if value is not a number and convert it to a number
     if (!isNumber(value)) {
         value = number(value)
@@ -370,11 +371,10 @@ func formatMemory(value)
     else
         return string(value / 1024) + " GB"
     }
+}
 
-/*
-    Window closing event handler
-    Properly shuts down the GUI application
-*/
+// Window closing event handler
+// Properly shuts down the GUI application
 func onClosing() {
     uiQuit()
 }

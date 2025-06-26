@@ -93,7 +93,7 @@ gpu = sys.gpu()
 // MEMORY INFORMATION
 // ===========================================
 
-// Retrieve memory statistics (all values in MB for RAM)
+// Retrieve memory statistics
 totalRam = formatMemory(sys.ram()[:size])  // Total installed RAM
 usedRam = formatMemory(sys.ram()[:used])   // Currently used RAM
 freeRam = formatMemory(sys.ram()[:free])   // Available free RAM
@@ -218,7 +218,7 @@ else
 // ===========================================
 
 // Helper function to format memory values with size formatting
-func formatMemory(value)
+func formatMemory(value) {
     // Check if value is not a number and convert it to a number
     if (!isNumber(value)) {
         value = number(value)
@@ -232,3 +232,4 @@ func formatMemory(value)
     else
         return string(value / 1024) + " GB"
     }
+}
