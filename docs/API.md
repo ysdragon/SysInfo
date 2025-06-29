@@ -22,6 +22,10 @@ For more examples and detailed usage instructions, see the [Usage Guide](./Usage
 
 The `SysInfo` class provides the following public methods:
 
+### `model()`
+Retrieves the device model.
+- **Returns**: `String` - The device model (e.g., "Surface Pro 11").
+
 ### `hostname()`
 Retrieves the system's hostname.
 - **Returns**: `String` - The hostname.

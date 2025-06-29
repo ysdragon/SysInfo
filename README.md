@@ -17,6 +17,7 @@ SysInfo is a powerful Ring package that provides easy access to essential system
 ## Features
 
 ### Core System Info
+- Device model
 - System hostname and username
 - OS name and kernel version
 - CPU model, cores, and usage metrics

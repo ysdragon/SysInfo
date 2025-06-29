@@ -15,6 +15,10 @@ Now, you can use the `sys` object to call various methods to fetch system inform
 Here's how to get some of the most common system details:
 
 ```ring
+// Get Device Model
+model = sys.model()
+? "Device Model: " + model
+
 // Get OS Information
 osDetails = sys.os()
 osName = osDetails[:name]  // e.g., "Void Linux"
