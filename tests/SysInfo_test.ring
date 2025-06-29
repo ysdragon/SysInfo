@@ -25,6 +25,7 @@ class SysInfoTest {
     func runAllTests() {
         ? "Starting SysInfo Test Suite..."
         
+        testModel()
         testHostname()
         testUsername()
         testOS()
@@ -45,6 +46,13 @@ class SysInfoTest {
         ? "All tests completed successfully!"
     }
 
+    func testModel() {
+        ? "Testing model()..."
+        model = sysInfo.model()
+        assert(!isNull(model), "Model should not be null")
+        assert(len(model) > 0, "Model should not be empty")
+    }
+    
     func testHostname() {
         ? "Testing hostname()..."
         hostname = sysInfo.hostname()
