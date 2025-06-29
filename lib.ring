@@ -437,6 +437,15 @@ class SysInfo {
         return networkInfo
     }
 
+    // Method to get device model
+    func model() {
+        // Get model info from modelInfo
+        modelInfo = modelInfo()
+
+        // Return the model info
+        return modelInfo
+    }
+
     private
 
     // Helper function to get osInfo
@@ -944,6 +953,43 @@ class SysInfo {
 
         // Return network interface information
         return networkInfo
+    }
+
+    // Helper function to get device model
+    func modelInfo() {
+        // Initialize model
+        model = "Unknown"
+
+        // Check if the OS is Windows
+        if (isWindows()) {
+            // Get the device model from winSysInfo List
+            if (!isNull(winSysInfo[:model])) {
+                model = winSysInfo[:model]
+            }
+        elseif (isLinux()) // If the OS is Linux
+            // Define a list of dmi file paths
+            dmiPaths = [
+                "/sys/class/dmi/id/product_name",
+                "/sys/class/dmi/id/product_version",
+                "/sys/class/dmi/id/board_name"
+            ]
+
+            // Loop through each dmi path to get the model
+            for path in dmiPaths {
+                if (fexists(path)) {
+                    fileContent = trim(readFile(path))
+                    if (!isNull(fileContent) and len(fileContent) > 0) {
+                        model = substr(fileContent, nl, "")
+                        return model
+                    }
+                }
+            }
+        elseif (isFreeBSD()) // If the OS is FreeBSD
+            model = trim(systemCmd("sysctl -n hw.model"))
+        }
+
+        // Return the model
+        return model
     }
 
     // Helper function to parse ip addr output (For Linux)
