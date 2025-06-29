@@ -23,6 +23,9 @@ func main() {
     // SYSTEM INFORMATION RETRIEVAL
     // ===========================================
     
+    // Device model
+    model = sys.model()
+
     // Basic system identification
     hostname = sys.hostname()
     username = sys.username()
@@ -89,6 +92,7 @@ func main() {
 
     hostForm = uiNewForm()
     uiFormSetPadded(hostForm, 1)
+    uiFormAppend(hostForm, "Device Model:", uiControl(uiNewLabel(model)), 0)
     uiFormAppend(hostForm, "Hostname:", uiControl(uiNewLabel(hostname)), 0)
     uiFormAppend(hostForm, "Username:", uiControl(uiNewLabel(username)), 0)
     uiFormAppend(hostForm, "System Uptime:", uiControl(uiNewLabel(uptime)), 0)

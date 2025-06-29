@@ -16,6 +16,9 @@ sys = new SysInfo
 // BASIC SYSTEM IDENTIFICATION
 // ===========================================
 
+// Get device model
+model = sys.model()
+
 // Retrieve system hostname (computer name on network)
 hostname = sys.hostname()
 
@@ -149,10 +152,11 @@ print("
     **                     RingFetch                     **
     **   Author: ysdragon (https://github.com/ysdragon)  **
 
+    OS: #{osName}
+    Host: #{model}
     Hostname: #{hostname}
     Username: #{username}
     Shell: #{shell}
-    OS: #{osName}
     Arch: #{arch}
     Kernel: #{version}
     Packages: #{pcount}
