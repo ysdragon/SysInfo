@@ -3,7 +3,8 @@
 */
 
 // PowerShell Script for Windows
-PS_SCRIPT = `$CPU_INFO = (Get-CimInstance -Query 'SELECT Name, NumberOfCores, NumberOfLogicalProcessors FROM Win32_Processor')
+PS_SCRIPT = `$MODEL = (Get-CimInstance -ClassName Win32_ComputerSystem).Model
+$CPU_INFO = (Get-CimInstance -Query 'SELECT Name, NumberOfCores, NumberOfLogicalProcessors FROM Win32_Processor')
 $CPU_USAGE = (Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 1 -MaxSamples 1).CounterSamples.CookedValue
 $CPU_MODELS = @()
 $CPU_COUNT = 0
@@ -99,6 +100,7 @@ foreach ($NET in $NETWORK_RAW) {
 }
 $isVM = [int]((Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer -match 'Microsoft Corporation|VMware|Xen|KVM|VirtualBox|QEMU')
 $Result = @{
+    model = $MODEL
     cpu = $CPU
     gpu = $GPUs
     ram = $RAM
