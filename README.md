@@ -109,6 +109,7 @@ Check out ***[RingFetch](https://github.com/ysdragon/SysInfo/tree/main/examples)
     - <img width="16" height="16" src="https://www.redhat.com/favicon.ico" /> Red Hat
     - <img width="16" height="16" src="https://aosc.io/assets/aosc.svg" /> AOSC OS
     - <img width="16" height="16" src="https://nixos.org/favicon.ico" /> NixOS
+    - <img width="16" height="16" src="https://img.alicdn.com/imgextra/i1/O1CN01oJnJZg1yK4RzI4Rx2_!!6000000006559-2-tps-118-118.png" /> Anolis OS
 - **<img width="20" height="20" src="https://www.freebsd.org/favicon.ico" /> FreeBSD**
     - FreeBSD 14
     - FreeBSD 15
