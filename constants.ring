@@ -134,7 +134,7 @@ pManagers = [
     ],
     :dnf = [
         :supported = [
-            "rhel", "fedora", "centos", "almalinux", "rockylinux", "mageia", "openmandriva", "ultramarine", "redhat", "oracle", "openEuler", "ol", "amzn"
+            "rhel", "fedora", "centos", "almalinux", "rockylinux", "mageia", "openmandriva", "ultramarine", "redhat", "oracle", "openEuler", "ol", "amzn", "anolis"
         ],
         :cmd = "rpm -qa | wc -l",
         :name = "rpm"
