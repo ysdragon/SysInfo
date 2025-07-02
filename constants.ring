@@ -176,7 +176,7 @@ pManagers = [
     ],
     :nix_env = [
         :supported = [
-            "nix"
+            "nixos"
         ],
         :cmd = "nix-store -q --requisites /run/current-system/sw | wc -l",
         :name = "nix_env"
