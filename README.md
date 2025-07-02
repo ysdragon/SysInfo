@@ -107,6 +107,7 @@ Check out ***[RingFetch](https://github.com/ysdragon/SysInfo/tree/main/examples)
     - <img width="16" height="16" src="https://www.openeuler.org/favicon.ico" /> openEuler
     - <img width="16" height="16" src="https://www.oracle.com/asset/web/favicons/favicon-32.png" /> Oracle
     - <img width="16" height="16" src="https://www.redhat.com/favicon.ico" /> Red Hat
+    - <img width="16" height="16" src="https://aosc.io/assets/aosc.svg" /> AOSC OS
 - **<img width="20" height="20" src="https://www.freebsd.org/favicon.ico" /> FreeBSD**
     - FreeBSD 14
     - FreeBSD 15
