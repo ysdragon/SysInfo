@@ -127,7 +127,7 @@ tUnits = [
 pManagers = [
     :dpkg = [
         :supported = [
-            "debian", "ubuntu", "devuan", "rhino", "linuxmint", "osmc", "antix", "pop", "popos", "elementary", "vanilla", "sparky", "kali", "kubuntu", "deepin", "tails", "voyager", "damnsmall", "q4os", "lubuntu", "parrot", "endless", "wattos", "watt", "qubes", "qubesos", "xubuntu", "bodhi", "gnoppix", "relianoid", "av", "avlinux", "pure", "pureos", "bros", "br", "spiral", "syslinux", "syslinuxos", "mate", "ubuntumate", "neptune", "lxle", "makulu", "emmabuntüs", "bunsenLabs", "kodachi", "nitrux"
+            "debian", "ubuntu", "devuan", "rhino", "linuxmint", "osmc", "antix", "pop", "popos", "elementary", "vanilla", "sparky", "kali", "kubuntu", "deepin", "tails", "voyager", "damnsmall", "q4os", "lubuntu", "parrot", "endless", "wattos", "watt", "qubes", "qubesos", "xubuntu", "bodhi", "gnoppix", "relianoid", "av", "avlinux", "pure", "pureos", "bros", "br", "spiral", "syslinux", "syslinuxos", "mate", "ubuntumate", "neptune", "lxle", "makulu", "emmabuntüs", "bunsenLabs", "kodachi", "nitrux", "aosc"
         ],
         :cmd = "dpkg-query -f '${binary:Package}\n' -W | wc -l",
         :name = "dpkg"
