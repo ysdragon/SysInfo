@@ -82,10 +82,10 @@ class SysInfo {
         return kVersion
     }
 
-    // Method to get CPU name, cores and threads
-    func cpu() {
+    // Method to get CPU name, cores, threads, usage and temp
+    func cpu(params) {
         // Get CPU info from cpuInfo
-        cpuInfo = cpuInfo()          
+        cpuInfo = cpuInfo(params)
 
         // Return cpuInfo
         return cpuInfo
@@ -503,7 +503,7 @@ class SysInfo {
     }
 
     // Helper function to get CPU info
-    func cpuInfo() {
+    func cpuInfo(params) {
         // Initialize the CPU info list
         cpuInfo = [
             :count = 1,
@@ -514,6 +514,12 @@ class SysInfo {
             :temp = NULL,
             :cpus = []
         ]
+
+        // Check if params contains :usage=0
+        getUsage = 0
+        if (isList(params) && params[:usage]) {
+            getUsage = params[:usage]
+        }
 
         // Check if the OS is Windows
         if (isWindows()) {
@@ -593,39 +599,41 @@ class SysInfo {
                 :threads = string(totalThreads)
             ])
 
-            // Get CPU usage and temperature
-            // Get initial CPU stats (CPU load)
-            initialStats = split(substr(split(readFile("/proc/stat"), nl)[1], 6), " ")
-            
-            // Sleep for 0.1 seconds (to update the CPU stats)
-            sleep(0.1)
+            // Get CPU usage and temperature if requested
+            if (getUsage) {
+                // Get initial CPU stats (CPU load)
+                initialStats = split(substr(split(readFile("/proc/stat"), nl)[1], 6), " ")
+                
+                // Sleep for 0.1 seconds (to update the CPU stats)
+                sleep(0.1)
 
-            // Get updated CPU stats after the sleep period (CPU load)
-            updatedStats = split(substr(split(readFile("/proc/stat"), nl)[1], 6), " ")
+                // Get updated CPU stats after the sleep period (CPU load)
+                updatedStats = split(substr(split(readFile("/proc/stat"), nl)[1], 6), " ")
 
-            // Initialize diffs list
-            diffs = []
+                // Initialize diffs list
+                diffs = []
 
-            // Calculate the diffs between updated and initial stats
-            for i = 1 to len(initialStats) {
-                // Subtract initial value from updated value and add the diff to the diffs list
-                add(diffs, updatedStats[i] - initialStats[i])
-            }
+                // Calculate the diffs between updated and initial stats
+                for i = 1 to len(initialStats) {
+                    // Subtract initial value from updated value and add the diff to the diffs list
+                    add(diffs, updatedStats[i] - initialStats[i])
+                }
 
-            // Get calculated CPU usage
-            cpuInfo[:usage] = 100 * (sumlist(diffs) - diffs[4]) / sumlist(diffs)
+                // Get calculated CPU usage
+                cpuInfo[:usage] = 100 * (sumlist(diffs) - diffs[4]) / sumlist(diffs)
 
-            // tempFile value
-            tempFile = "/sys/class/thermal/thermal_zone0/temp"
-            
-            // Check if tempFile exists (because VMs don't have this file)
-            if (fexists(tempFile)) {
-                // Get CPU temp
-                cpuTemp = number(readFile(tempFile))
-                // Convert CPU temp from millidegrees to degrees
-                cpuInfo[:temp] = cpuTemp / 1000
-            else // If tempFile doesn't exist
-                cpuInfo[:temp] = NULL
+                // tempFile value
+                tempFile = "/sys/class/thermal/thermal_zone0/temp"
+                
+                // Check if tempFile exists (because VMs don't have this file)
+                if (fexists(tempFile)) {
+                    // Get CPU temp
+                    cpuTemp = number(readFile(tempFile))
+                    // Convert CPU temp from millidegrees to degrees
+                    cpuInfo[:temp] = cpuTemp / 1000
+                else // If tempFile doesn't exist
+                    cpuInfo[:temp] = NULL
+                }
             }
         
         elseif (isFreeBSD()) // If the OS is FreeBSD
@@ -654,40 +662,43 @@ class SysInfo {
                 ])
             }
             
-            // Get CPU usage
-            // Get initial CPU stats
-            initialStats = systemCmd("sysctl -n kern.cp_time")
-            initialStats = split(initialStats, " ")
-            
-            // Sleep for 0.1 seconds (to update the CPU stats)
-            sleep(0.1)
-            
-            // Get updated CPU stats after the sleep period
-            updatedStats = systemCmd("sysctl -n kern.cp_time")
-            updatedStats = split(updatedStats, " ")
-            
-            // Convert string values to numbers and calculate differences
-            diffs = []
-            totalDiff = 0
-            for i = 1 to len(initialStats) {
-                diffValue = number(updatedStats[i]) - number(initialStats[i])
-                add(diffs, diffValue)
-                totalDiff += diffValue
-            }
-            
-            // Calculate CPU usage (in FreeBSD, the last value is idle time)
-            idleIndex = len(diffs)
-            if (totalDiff > 0) {
-                cpuInfo[:usage] = 100 * (totalDiff - diffs[idleIndex]) / totalDiff
-            else
-                cpuInfo[:usage] = 0
-            }
-            
-            // Check if the system is not a VM
-            if (!isVM()) {
-                tempInfo = systemCmd("sysctl -n dev.cpu.0.temperature")
-                if (!isNull(tempInfo)) {
-                    cpuInfo[:temp] = number(substr(tempInfo, 1, len(tempInfo) - 2))
+            // Get CPU usage and temperature if requested
+            if (getUsage) {
+                // Get CPU usage
+                // Get initial CPU stats
+                initialStats = systemCmd("sysctl -n kern.cp_time")
+                initialStats = split(initialStats, " ")
+                
+                // Sleep for 0.1 seconds (to update the CPU stats)
+                sleep(0.1)
+                
+                // Get updated CPU stats after the sleep period
+                updatedStats = systemCmd("sysctl -n kern.cp_time")
+                updatedStats = split(updatedStats, " ")
+                
+                // Convert string values to numbers and calculate differences
+                diffs = []
+                totalDiff = 0
+                for i = 1 to len(initialStats) {
+                    diffValue = number(updatedStats[i]) - number(initialStats[i])
+                    add(diffs, diffValue)
+                    totalDiff += diffValue
+                }
+                
+                // Calculate CPU usage (in FreeBSD, the last value is idle time)
+                idleIndex = len(diffs)
+                if (totalDiff > 0) {
+                    cpuInfo[:usage] = 100 * (totalDiff - diffs[idleIndex]) / totalDiff
+                else
+                    cpuInfo[:usage] = 0
+                }
+                
+                // Check if the system is not a VM
+                if (!isVM()) {
+                    tempInfo = systemCmd("sysctl -n dev.cpu.0.temperature")
+                    if (!isNull(tempInfo)) {
+                        cpuInfo[:temp] = number(substr(tempInfo, 1, len(tempInfo) - 2))
+                    }
                 }
             }
         }
