@@ -43,11 +43,11 @@ foreach ($GPU in $GPU_INFO) {
     }
 }
 $OS = (Get-CimInstance -Query 'SELECT Caption, Version, FreePhysicalMemory FROM Win32_OperatingSystem')
-$TOTAL_RAM = [math]::round((Get-CimInstance -Query 'SELECT Capacity FROM Win32_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1MB, 2)
+$TOTAL_RAM = [math]::round((Get-CimInstance -Query 'SELECT Capacity FROM Win32_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1KB, 0)
 $PAGE_FILES = Get-CimInstance -Class Win32_PageFileUsage
-$FREE_RAM = [math]::round($OS.FreePhysicalMemory / 1KB, 2)
-$USED_RAM = [math]::round($TOTAL_RAM - $FREE_RAM, 2)
-$TOTAL_SWAP = [math]::round((($PAGE_FILES | Measure-Object -Property AllocatedBaseSize -Sum).Sum), 2)
+$FREE_RAM = [math]::round($OS.FreePhysicalMemory, 0)
+$USED_RAM = [math]::round($TOTAL_RAM - $FREE_RAM, 0)
+$TOTAL_SWAP = [math]::round((($PAGE_FILES | Measure-Object -Property AllocatedBaseSize -Sum).Sum * 1024), 0)
 $RAM = @{
     size = $TOTAL_RAM
     used = $USED_RAM
