@@ -222,6 +222,7 @@ filteredStorageParts = [
     "tmpfs",
     "devtmpfs", 
     "dev",
+    "devfs",
     "run",
     "shm",
     "proc",
