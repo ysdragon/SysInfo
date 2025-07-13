@@ -84,7 +84,7 @@ class SysInfoTest {
 
     func testCPU() {
         ? "Testing cpu()..."
-        cpuInfo = sysInfo.cpu()
+        cpuInfo = sysInfo.cpu([:usage = 1])
         assert(isList(cpuInfo), "CPU info should be a list")
         assert(!isNull(cpuInfo[:model]), "CPU model should not be null")
         assert(number(cpuInfo[:cores]) > 0, "CPU cores should be greater than 0")
