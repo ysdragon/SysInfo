@@ -199,22 +199,22 @@ pManagers = [
 
 // Virtualization indicators list 
 virtIndicators = [
-    "KVM",
-    "QEMU",
-    "VMware",
-    "VMW",
+    "kvm",
+    "qemu",
+    "vmware",
+    "vmw",
     "innotek",
-    "Xen",
-    "Bochs",
-    "Parallels",
-    "BHYVE",
-    "OpenStack",
-    "KubeVirt",
-    "Amazon EC2",
-    "Oracle Corporation",
-    "Hyper-V",
-    "Apple Virtualization",
-    "Google Compute Engine"
+    "xen",
+    "bochs",
+    "parallels",
+    "bhyve",
+    "openstack",
+    "kubevirt",
+    "amazon ec2",
+    "oracle corporation",
+    "hyper-v",
+    "apple virtualization",
+    "google compute engine"
 ]
 
 // Storage parts to filter out (temporary filesystems, virtual filesystems, etc.)
