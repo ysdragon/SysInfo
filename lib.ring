@@ -222,49 +222,8 @@ class SysInfo {
 
     // Method to get storage disks info
     func storageDisks() {
-        // Initialize the blockDevices list
-        blockDevices = []
-        // Initialize the StorageDisks list
-        storageDisks = []
-
-        // Check if the OS is Windows
-        if (isWindows()) {
-            // Get storage disks (name, size) from winSysInfo
-            storageDisks = winSysInfo[:disks]
-        elseif (isLinux()) // If the OS is Linux
-            // Get blockdevices from StorageInfo
-            storageDisks = storageInfo() 
-        elseif (isFreeBSD()) // If the OS is FreeBSD
-            // Use geom to get disk information
-            diskOutput = systemCmd("geom disk list")
-            
-            // Process output and directly extract disk information
-            diskLines = split(diskOutput, nl)
-            currentDisk = ""
-            
-            for line in diskLines {
-                line = trim(line)
-                
-                // Check if this is a disk name line
-                if substr(line, "Geom name:") = 1 {
-                    currentDisk = trim(substr(line, 11))
-                }
-                
-                // Check if this is a disk size line
-                if !isNull(currentDisk) and substr(line, "Mediasize:") = 1 {
-                    // Extract the human-readable size
-                    openParen = substr(line, "(")
-                    closeParen = substr(line, ")")
-                    
-                    if openParen > 0 and closeParen > openParen {
-                        diskSize = trim(substr(line, openParen + 1, closeParen - openParen - 1))
-                        // Add disk to StorageDisks with both name and size
-                        add(storageDisks, [:name = currentDisk, :size = diskSize])
-                        currentDisk = "" // Reset for next disk
-                    }
-                }
-            }        
-        }
+        // Get storage disks (name, size) from storageInfo
+        storageDisks = storageInfo()
 
         // Return storage disks
         return storageDisks
@@ -908,46 +867,104 @@ class SysInfo {
         return fUptime
     }
 
-    // Helper function to get Storage Info (For Linux)
+    // Helper function to get Storage Info
     func storageInfo() {
         // Initialize the blockDevices list
         blockDevices = []
 
-        // Read /proc/partitions to get block devices
-        storageInfo = readFile("/proc/partitions")
+        if isWindows() {
+            // Get block devices from winSysInfo
+            blockDevices = winSysInfo[:disks]
+        elseif(isLinux())
+            // Read /proc/partitions to get block devices
+            storageInfo = readFile("/proc/partitions")
 
-        // Split the storageInfo by newlines
-        aLines = split(storageInfo, nl)
+            // Split the storageInfo by newlines
+            aLines = split(storageInfo, nl)
 
-        // Start loop after the header lines
-        for i = 3 to len(aLines) {
-            cLine = trim(aLines[i])
+            // Start loop after the header lines
+            for i = 3 to len(aLines) {
+                cLine = trim(aLines[i])
 
-            // Skip empty lines
-            if (!len(cLine)) {
-                continue
-            }
+                // Skip empty lines
+                if (!len(cLine)) {
+                    continue
+                }
 
-            // Split the line into columns
-            aParts = split(cLine, " ")
+                // Split the line into columns
+                aParts = split(cLine, " ")
 
-            // A valid disk line should have 4 parts
-            if (len(aParts) = 4) {
-                cName = aParts[4]
-                nSize = number(aParts[3])
+                // A valid disk line should have 4 parts
+                if (len(aParts) = 4) {
+                    cName = aParts[4]
+                    nSize = number(aParts[3])
 
-                // Check if the last character of the name is NOT a digit
-                // This identifies parent disks like 'sda', 'sdb', 'nvme0n1'
-                cLastChar = right(cName, 1)
-                if (!isdigit(cLastChar)) {
-                    // Create a structured list for this disk
-                    aDiskInfo = [
-                        :name = cName,
-                        :size = nSize
-                    ]
-                    add(blockDevices, aDiskInfo)
+                    // Check if the last character of the name is NOT a digit
+                    // This identifies parent disks like 'sda', 'sdb', 'nvme0n1'
+                    cLastChar = right(cName, 1)
+                    if (!isdigit(cLastChar)) {
+                        // Create a structured list for this disk
+                        aDiskInfo = [
+                            :name = cName,
+                            :size = nSize
+                        ]
+                        add(blockDevices, aDiskInfo)
+                    }
                 }
             }
+        elseif (isFreeBSD())
+            // Use geom to get disk information
+            diskOutput = systemCmd("geom disk list")
+            
+            // Split the output by newlines
+            diskLines = split(diskOutput, nl)
+
+            // Initialize currentDisk
+            currentDisk = ""
+            
+            // Loop through every line in diskLines
+            for line in diskLines {
+                // Trim whitespace from the line
+                line = trim(line)
+                
+                // Detect start of a new disk block
+                if (substr(line, "Geom name:")) {
+                    currentDisk = trim(substr(line, 11))
+                    continue
+                }
+                
+                // Extract disk size if disk name is set
+                if (!isNull(currentDisk) && substr(line, "Mediasize:")) {
+                    // Find the position of "Mediasize:"
+                    mediasizePos = substr(line, "Mediasize:") + len("Mediasize:")
+
+                    // Extract the rest of the line after "Mediasize:"
+                    rest = trim(substr(line, mediasizePos))
+
+                    // Find first number (bytes) before any non-digit
+                    bytesStr = ""
+                    for i = 1 to len(rest) {
+                        ch = substr(rest, i, 1)
+                        if (isdigit(ch)) {
+                            bytesStr += ch
+                        else
+                            break
+                        }
+                    }
+
+                    // Convert bytes to KB
+                    diskSize = number(bytesStr) / 1024
+
+                    // Only add if disk name and size are valid
+                    if (!isNull(currentDisk) and diskSize > 0) {
+                        add(blockDevices, [:name = currentDisk, :size = diskSize])
+                    }
+
+                    // Reset currentDisk for next disk
+                    currentDisk = ""
+                }
+            }
+
         }
 
         // Return blockDevices
