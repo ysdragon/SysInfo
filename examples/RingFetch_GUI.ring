@@ -37,10 +37,11 @@ func main() {
     uptime = sys.sysUptime([])
 
     // CPU information with performance metrics
-    cpuModel = sys.cpu()[:model]
-    cpuCores = string(sys.cpu()[:cores])
-    cpuThreads = string(sys.cpu()[:threads])
-    cpuUsage = string(sys.cpu()[:usage]) + "%"
+    cpuInfo = sys.cpu([:usage = 1])
+    cpuModel = cpuInfo[:model]
+    cpuCores = string(cpuInfo[:cores])
+    cpuThreads = string(cpuInfo[:threads])
+    cpuUsage = string(cpuInfo[:usage]) + "%"
 
     // Memory statistics
     totalRam = sys.ram()[:size]
@@ -155,7 +156,7 @@ func main() {
     cpuTemp = "Not available"
     if (isUnix() && !sys.isVM()) {
         try {
-            tempValue = sys.cpu()[:temp]
+            tempValue = cpuInfo[:temp]
             if (!isNull(tempValue)) {
                 cpuTemp = string(tempValue) + "°C"
             }

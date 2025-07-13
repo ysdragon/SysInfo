@@ -61,26 +61,29 @@ version = sys.version()
 //   usage   - Current CPU usage percentage
 //   temp    - CPU temperature (Unix-like systems, non-VM only)
 
+// Get all CPU information, including usage and temperature
+cpuInfo = sys.cpu([:usage = 1])
+
 // Get number of physical CPU packages
-cpuCount = sys.cpu()[:count]
+cpuCount = cpuInfo[:count]
 
 // Format CPU model display based on CPU count
 if (cpuCount > 1) {
     // Multiple CPUs: show count prefix (e.g., "2x Intel Core i7...")
-    cpuModel = string(cpuCount) + "x " + sys.cpu()[:model]
+    cpuModel = string(cpuCount) + "x " + cpuInfo[:model]
 else
     // Single CPU: show model name only
-    cpuModel = sys.cpu()[:model]
+    cpuModel = cpuInfo[:model]
 }
 
 // Get CPU specifications
-cpuCores = sys.cpu()[:cores]     // Total number of cores
-cpuThreads = sys.cpu()[:threads] // Total number of logical processors
-cpuUsage = string(sys.cpu()[:usage]) + "%" // Current usage percentage
+cpuCores = cpuInfo[:cores]     // Total number of cores
+cpuThreads = cpuInfo[:threads] // Total number of logical processors
+cpuUsage = string(cpuInfo[:usage]) + "%" // Current usage percentage
 
 // Get CPU temperature (available on Unix-like systems, non-VM environments)
 if(isUnix() && !sys.isVM()) {
-    cpuTemp = ", Temp " + sys.cpu()[:temp] + "°"
+    cpuTemp = ", Temp " + cpuInfo[:temp] + "°"
 else
     cpuTemp = NULL // Temperature not available on Windows or VMs
 }
