@@ -272,8 +272,6 @@ class SysInfo {
 
     // Method to get storage parts info
     func storageParts() { 
-        // Initialize the blockDevices list
-        blockDevices = []
         // Initialize the storageParts list
         storageParts = []
 
