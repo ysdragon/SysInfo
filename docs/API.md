@@ -13,7 +13,7 @@ sys = new SysInfo
 ? "OS: " + sys.os()[:name]
 ? "Hostname: " + sys.hostname()
 ? "CPU: " + sys.cpu()[:model]
-? "Total RAM: " + (sys.ram()[:size] / 1024) + " GB" // Note: RAM size is in MB
+? "Total RAM: " + (sys.ram()[:size] / 1024 / 1024) + " GB" // Note: RAM size is in KB
 ```
 
 For more examples and detailed usage instructions, see the [Usage Guide](./Usage.md).
@@ -44,15 +44,17 @@ Retrieves operating system information.
 Retrieves the kernel version of the operating system.
 - **Returns**: `String` - The kernel version.
 
-### `cpu()`
+### `cpu(params)`
 Retrieves detailed CPU information.
+- **Args**: `params` (List) - An optional list to specify additional information to retrieve.
+    - Example: `[:usage = 1]` to include CPU usage and temperature.
 - **Returns**: `List` - A list containing:
     - `:count` (Number): Number of physical CPUs.
     - `:model` (String): CPU model name.
     - `:cores` (String): Total number of cores.
     - `:threads` (String): Total number of threads.
-    - `:usage` (Number/Null): CPU usage percentage (Null if not available).
-    - `:temp` (Number/Null): CPU temperature in Celsius (Null if not available or on VMs for some OSes).
+    - `:usage` (Number/Null): CPU usage percentage (Null if not available or `[:usage = 1]` was not passed).
+    - `:temp` (Number/Null): CPU temperature in Celsius (Null if not available, on VMs for some OSes, or `[:usage = 1]` was not passed).
     - `:cpus` (List of Lists): Detailed information for each CPU (if available). Each sub-list contains:
         - `:number` (Number): CPU identifier.
         - `:model` (String): Model name for this CPU.
@@ -74,26 +76,26 @@ Retrieves information about the current terminal emulator (Unix-like OSes only).
 - **Returns**: `String` - Terminal name and version (e.g., "xterm-256color") or "Unknown".
 
 ### `ram()`
-Retrieves RAM and Swap/Pagefile information. Values are in MB.
+Retrieves RAM and Swap/Pagefile information. Values are in KB.
 - **Returns**: `List` - A list containing:
-    - `:size` (Number): Total physical RAM in MB.
-    - `:used` (Number): Used physical RAM in MB.
-    - `:free` (Number): Free physical RAM in MB.
-    - `:swap` (Number): Total Swap/Pagefile space in MB.
+    - `:size` (Number): Total physical RAM.
+    - `:used` (Number): Used physical RAM.
+    - `:free` (Number): Free physical RAM.
+    - `:swap` (Number): Total Swap/Pagefile space.
 
 ### `storageDisks()`
 Retrieves information about physical storage disks.
 - **Returns**: `List` of Lists - Each sub-list represents a disk and contains:
     - `:name` (String): Disk model or name.
-    - `:size` (String): Disk size (e.g., "100G").
+    - `:size` (String): Disk size in KB.
 
 ### `storageParts()`
 Retrieves information about storage partitions/logical disks.
 - **Returns**: `List` of Lists - Each sub-list represents a partition and contains:
-    - `:name` (String): Partition name/mount point.
-    - `:size` (String): Partition size.
-    - `:used` (String): Used space on the partition.
-    - `:free` (String): Free space on the partition.
+    - `:name` (String): Partition name.
+    - `:size` (String): Partition size in KB.
+    - `:used` (String): Used space on the partition in KB.
+    - `:free` (String): Free space on the partition in KB.
 
 ### `sysUptime(params)`
 Calculates and formats the system uptime.
@@ -112,7 +114,7 @@ Retrieves the count of installed packages (Linux/FreeBSD) or programs via Winget
 
 ### `isVM()`
 Checks if the system is likely a virtual machine.
-- **Returns**: `Boolean` - `true` if a VM is detected, `false` otherwise.
+- **Returns**: `Number` - `1` if a VM is detected, `0` otherwise.
 
 ### `network()`
 Retrieves network interface information.

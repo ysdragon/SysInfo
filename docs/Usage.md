@@ -47,25 +47,28 @@ architecture = sys.arch()
 The `cpu()` method returns a list with detailed CPU data.
 
 ```ring
-cpuInfo = sys.cpu()
+// Get basic CPU information
+cpuInfoBasic = sys.cpu([]) // Pass an empty list to get basic CPU info
+? "CPU Model (Basic): " + cpuInfoBasic[:model]
+? "Physical CPU Count: " + cpuInfoBasic[:count]
+? "Total Cores: " + cpuInfoBasic[:cores]
+? "Total Threads: " + cpuInfoBasic[:threads]
 
-? "CPU Model: " + cpuInfo[:model]
-? "Physical CPU Count: " + cpuInfo[:count]
-? "Total Cores: " + cpuInfo[:cores]
-? "Total Threads: " + cpuInfo[:threads]
+// Get CPU information including usage and temperature
+cpuInfoFull = sys.cpu([:usage = 1]) // Pass [:usage = 1] to get usage and temp
 
-if !isNull(cpuInfo[:usage]) {
-    ? "CPU Usage: " + cpuInfo[:usage] + "%"
+if (!isNull(cpuInfoFull[:usage])) {
+    ? "CPU Usage: " + cpuInfoFull[:usage] + "%"
 }
 
-if !isNull(cpuInfo[:temp]) {
-    ? "CPU Temperature: " + cpuInfo[:temp] + "°C"
+if (!isNull(cpuInfoFull[:temp])) {
+    ? "CPU Temperature: " + cpuInfoFull[:temp] + "°C"
 }
 
 // For multi-CPU systems, you can iterate through individual CPU details:
-if isList(cpuInfo[:cpus]) and len(cpuInfo[:cpus]) > 0 and cpuInfo[:count] > 1 {
+if (isList(cpuInfoFull[:cpus]) && len(cpuInfoFull[:cpus]) > 0 && cpuInfoFull[:count] > 1) {
     ? "Individual CPU Details:"
-    for singleCpu in cpuInfo[:cpus] {
+    for singleCpu in cpuInfoFull[:cpus] {
         ? "  CPU " + singleCpu[:number] + ": " + singleCpu[:model] + ", Cores: " + singleCpu[:cores] + ", Threads: " + singleCpu[:threads]
     }
 }
@@ -96,15 +99,15 @@ if isUnix() {
 
 ## Accessing RAM and Swap/Pagefile Details
 
-RAM and Swap values are returned in MB.
+RAM and Swap values are returned in KB.
 
 ```ring
 ramInfo = sys.ram()
 
-? "Total RAM: " + ramInfo[:size] + " MB"
-? "Used RAM: " + ramInfo[:used] + " MB"
-? "Free RAM: " + ramInfo[:free] + " MB"
-? "Swap/Pagefile Total: " + ramInfo[:swap] + " MB"
+? "Total RAM: " + (ramInfo[:size] / 1024 / 1024) + " GB"
+? "Used RAM: " + (ramInfo[:used] / 1024 / 1024) + " GB"
+? "Free RAM: " + (ramInfo[:free] / 1024 / 1024) + " GB"
+? "Swap/Pagefile Total: " + (ramInfo[:swap] / 1024 / 1024) + " GB"
 ```
 
 ## Listing Storage Devices
@@ -114,9 +117,9 @@ ramInfo = sys.ram()
 ```ring
 storageDisks = sys.storageDisks()
 ? "Storage Disks:"
-if isList(storageDisks) and len(storageDisks) > 0 {
+if (isList(storageDisks) && len(storageDisks) > 0) {
     for disk in storageDisks {
-        ? "  Name: " + disk[:name] + ", Size: " + disk[:size]
+        ? "  Name: " + disk[:name] + ", Size: " + (disk[:size] / 1024 / 1024) + " GB"
     }
 else
     ? "  No physical disks detected or information unavailable."
@@ -128,9 +131,9 @@ else
 ```ring
 storageParts = sys.storageParts()
 ? "Storage Partitions:"
-if isList(storageParts) and len(storageParts) > 0 {
+if (isList(storageParts) && len(storageParts) > 0) {
     for part in storageParts {
-        ? "  Name/Mount: " + part[:name] + ", Size: " + part[:size] + ", Used: " + part[:used] + ", Free: " + part[:free]
+        ? "  Name/Mount: " + part[:name] + ", Size: " + (part[:size] / 1024 / 1024) + " GB" + ", Used: " + (part[:used] / 1024 / 1024) + " GB" + ", Free: " + (part[:free] / 1024 / 1024) + " GB"
     }
 else
     ? "  No storage partitions detected or information unavailable."
@@ -166,7 +169,7 @@ packageCount = sys.pCount()
 
 ```ring
 isVirtualMachine = sys.isVM()
-if isVirtualMachine {
+if (isVirtualMachine) {
     ? "System is running on a Virtual Machine."
 else
     ? "System is not running on a Virtual Machine."
@@ -178,7 +181,7 @@ else
 ```ring
 networkInterfaces = sys.network()
 ? "Network Interfaces:"
-if isList(networkInterfaces) and len(networkInterfaces) > 0 {
+if (isList(networkInterfaces) && len(networkInterfaces) > 0) {
     for iface in networkInterfaces {
         line = "  " + iface[:name] + " - IP: " + iface[:ip]
         if (!isNull(iface[:status])) {
