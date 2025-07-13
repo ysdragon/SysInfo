@@ -399,9 +399,9 @@ class SysInfo {
                 if (fexists(path)) {
                     // Read the content of the dmi file and split it into lines
                     dmiContent = split(readFile(path), nl)
-                    // Loop through the list of known virtualization indicators
-                    for indicator in virtIndicators {
-                        if (lower(dmiContent[1]) = lower(indicator)) {
+                    // Check if any known virtualization indicator is present in dmiContent
+                    for line in dmiContent {
+                        if (find(virtIndicators, lower(trim(line)))) {
                             // Return true if a match is found
                             return true
                         }
@@ -414,12 +414,10 @@ class SysInfo {
 
             // Check if the VM info is not null
             if (!isNull(vmInfo)) {
-                // Loop through the list of known virtualization indicators
-                for indicator in virtIndicators {
-                    if (lower(vmInfo) = lower(indicator)) {
-                        // Return true if a match is found
-                        return true
-                    }
+                // Check if any known virtualization indicator is present in vmInfo
+                if (find(virtIndicators, lower(vmInfo))) {
+                    // Return true if a match is found
+                    return true
                 }
             }
         }
