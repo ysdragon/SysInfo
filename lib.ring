@@ -189,31 +189,25 @@ class SysInfo {
             // Get raw memory info
             memInfo = memoryInfo()
         
-            // Extract memory values in KB and convert to bytes
-            totalBytes = memInfo[:MemTotal][1] * 1024
-            freeBytes = memInfo[:MemAvailable][1] * 1024
-            swapBytes = memInfo[:SwapTotal][1] * 1024
-            usedBytes = totalBytes - freeBytes
+            // Add memory values to ramInfo
+            ramInfo = [
+                :size = memInfo[:MemTotal][1],
+                :free = memInfo[:MemAvailable][1],
+                :used = memInfo[:MemTotal][1] - memInfo[:MemAvailable][1],
+                :swap = memInfo[:SwapTotal][1]
+            ]
             
-            // Add size to ramInfo
-            ramInfo[:size] = formatBytes(totalBytes)
-            // Add used to ramInfo
-            ramInfo[:used] = formatBytes(usedBytes)
-            // Add free to ramInfo
-            ramInfo[:free] = formatBytes(freeBytes)
-            // Add swap to ramInfo
-            ramInfo[:swap] = formatBytes(swapBytes)
         elseif (isFreeBSD()) // If the OS is FreeBSD
             // Get ramInfo from memoryInfo
-            ramInfo = memoryInfo()
-            // Add size to ramInfo
-            ramInfo[:size] = formatBytes(ramInfo[1])
-            // Add free to ramInfo 
-            ramInfo[:free] = formatBytes(ramInfo[2] * ramInfo[3])
-            // Add used to ramInfo
-            ramInfo[:used] = formatBytes(ramInfo[1] - (ramInfo[2] * ramInfo[3]))
-            // Add swap to ramInfo
-            ramInfo[:swap] = formatBytes(ramInfo[4])
+            memInfo = memoryInfo()
+
+            // Add memory values to ramInfo
+            ramInfo = [
+                :size = memInfo[1],
+                :free = memInfo[2] * memInfo[3],
+                :used = memInfo[1] - (memInfo[2] * memInfo[3]),
+                :swap = memInfo[4]
+            ]
         }
                 
         // Return Ram info
