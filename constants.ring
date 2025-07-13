@@ -59,7 +59,7 @@ $DISKS = @()
 foreach ($DISK in $DISKS_RAW) {
     $DISKS += @{
         name = $DISK.Model
-        size = Format-Size $DISK.Size
+        size = [math]::Round($DISK.Size / 1KB, 0)
     }
 }
 $PARTS_RAW = (Get-CimInstance -Query 'SELECT Size, FreeSpace, Caption FROM Win32_LogicalDisk WHERE DriveType=3')
@@ -68,9 +68,9 @@ foreach ($PART in $PARTS_RAW) {
     $usedBytes = $PART.Size - $PART.FreeSpace
     $PARTS += @{
         name = $PART.Caption
-        size = Format-Size $PART.Size
-        used = Format-Size $usedBytes
-        free = Format-Size $PART.FreeSpace
+        size = [math]::Round($PART.Size / 1KB, 0)
+        used = [math]::Round($usedBytes / 1KB, 0)
+        free = [math]::Round($PART.FreeSpace / 1KB, 0)
     }
 }
 $PCOUNT = (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\* | Measure-Object).Count
