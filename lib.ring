@@ -1153,31 +1153,4 @@ class SysInfo {
         // Return the contents from the file
         return result
     }
-
-    // Helper function to format bytes into appropriate units
-    func formatBytes(bytes) {
-        // Handle null values
-        if (isNull(bytes)) {
-            return 0
-        }
-        
-        // Convert to number if it's a string
-        numBytes = 0
-        if (isString(bytes)) {
-            numBytes = number(bytes)
-        else
-            numBytes = bytes
-        }
-        
-        // Handle zero or negative values
-        if (numBytes <= 0) {
-            return 0
-        }
-        
-        // Convert to MB and round to 2 decimal places
-        mbValue = numBytes / 1024 / 1024
-        
-        // Return the numeric value only
-        return floor(mbValue * 100) / 100
-    }
 }
