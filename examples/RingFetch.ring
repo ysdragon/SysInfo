@@ -97,18 +97,18 @@ gpu = sys.gpu()
 // ===========================================
 
 // Retrieve memory statistics
-totalRam = formatMemory(sys.ram()[:size])  // Total installed RAM
-usedRam = formatMemory(sys.ram()[:used])   // Currently used RAM
-freeRam = formatMemory(sys.ram()[:free])   // Available free RAM
+totalRam = formatSize(sys.ram()[:size])  // Total installed RAM
+usedRam = formatSize(sys.ram()[:used])   // Currently used RAM
+freeRam = formatSize(sys.ram()[:free])   // Available free RAM
 
 // Handle swap/pagefile information based on operating system
 swapRam = NULL
 if (isWindows()) {
     // Windows uses pagefile for virtual memory
-    swapRam = "Pagefile: " + formatMemory(sys.ram()[:swap])
+    swapRam = "Pagefile: " + formatSize(sys.ram()[:swap])
 elseif (isUnix())
     // Unix-like systems use swap partitions/files
-    swapRam = "Swap: " + formatMemory(sys.ram()[:swap])
+    swapRam = "Swap: " + formatSize(sys.ram()[:swap])
 }
 
 // ===========================================
@@ -170,7 +170,7 @@ print("
 print("    Storage Disks: \n")
 for disk in disks {
     diskName = disk[:name]  // Device model/name
-    diskSize = disk[:size]  // Device capacity
+    diskSize = formatSize(disk[:size])  // Device capacity
     print("             #{diskName} Size: #{diskSize}\n")
 }
 
@@ -186,9 +186,9 @@ if (isList(storageParts) and len(storageParts) > 0) {
     for part in storageParts {
         if (isList(part)) {
             partName = part[:name]  // Mount point or drive letter
-            partSize = part[:size]  // Total partition size
-            partUsed = part[:used]  // Used space
-            partFree = part[:free]  // Available free space
+            partSize = formatSize(part[:size])  // Total partition size
+            partUsed = formatSize(part[:used])  // Used space
+            partFree = formatSize(part[:free])  // Available free space
             print("             #{partName} Size: #{partSize}, Used: #{partUsed}, Free: #{partFree}\n")
         }
     }
@@ -221,19 +221,16 @@ else
 // HELPER FUNCTIONS
 // ===========================================
 
-// Helper function to format memory values with size formatting
-func formatMemory(value) {
-    // Check if value is not a number and convert it to a number
-    if (!isNumber(value)) {
-        value = number(value)
-    }
-
-    // Format memory size in KB, MB, or GB based on value
-    if (value < 1) {
-        return string(value * 1024) + " KB"
-    elseif (value < 1024)
-        return string(value) + " MB"
-    else
-        return string(value / 1024) + " GB"
-    }
+// Helper function to format size values
+func formatSize(size) {
+	if size < 1024
+		return string(size) + " K"
+	ok
+	if size < 1024 * 1024
+		return string(size / 1024) + " M"
+	ok
+	if size < 1024 * 1024 * 1024
+		return string(size / (1024 * 1024)) + " G"
+	ok
+	return string(size / (1024 * 1024 * 1024)) + " T"
 }

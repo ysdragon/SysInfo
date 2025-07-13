@@ -193,9 +193,9 @@ func main() {
     memForm = uiNewForm()
     uiFormSetPadded(memForm, 1)
     uiBoxAppend(memBox, uiControl(memForm), 0)
-    uiFormAppend(memForm, "Total RAM:", uiControl(uiNewLabel(formatMemory(totalRam))), 0)
-    uiFormAppend(memForm, "Used RAM:", uiControl(uiNewLabel(formatMemory(usedRam))), 0)
-    uiFormAppend(memForm, "Free RAM:", uiControl(uiNewLabel(formatMemory(freeRam))), 0)
+    uiFormAppend(memForm, "Total RAM:", uiControl(uiNewLabel(formatSize(totalRam))), 0)
+    uiFormAppend(memForm, "Used RAM:", uiControl(uiNewLabel(formatSize(usedRam))), 0)
+    uiFormAppend(memForm, "Free RAM:", uiControl(uiNewLabel(formatSize(freeRam))), 0)
     
     // Display swap/pagefile based on operating system
     if (isWindows()) {
@@ -203,7 +203,7 @@ func main() {
     else
         swapLabel = "Swap:"
     }
-    uiFormAppend(memForm, swapLabel, uiControl(uiNewLabel(formatMemory(swapRam))), 0)
+    uiFormAppend(memForm, swapLabel, uiControl(uiNewLabel(formatSize(swapRam))), 0)
 
     uiGroupSetChild(memGroup, uiControl(memBox))
     uiBoxAppend(hwPage, uiControl(memGroup), 0)
@@ -256,7 +256,7 @@ func main() {
             if (isList(disk)) {
                 diskName = disk[:name]
                 diskSize = disk[:size]
-                uiFormAppend(diskForm, diskName + ":", uiControl(uiNewLabel("Capacity: " + diskSize)), 0)
+                uiFormAppend(diskForm, diskName + ":", uiControl(uiNewLabel("Capacity: " + formatSize(diskSize))), 0)
             }
         }
     else
@@ -281,9 +281,9 @@ func main() {
         for part in parts {
             if (isList(part)) {
                 partName = part[:name]
-                partSize = part[:size]
-                partUsed = part[:used]
-                partFree = part[:free]
+                partSize = formatSize(part[:size])
+                partUsed = formatSize(part[:used])
+                partFree = formatSize(part[:free])
                 partInfo = "Total: " + partSize + " | Used: " + partUsed + " | Free: " + partFree
                 uiFormAppend(partForm, partName + ":", uiControl(uiNewLabel(partInfo)), 0)
             }
@@ -360,21 +360,18 @@ func main() {
 // HELPER FUNCTIONS
 // ===========================================
 
-// Helper function to format memory values with size formatting
-func formatMemory(value) {
-    // Check if value is not a number and convert it to a number
-    if (!isNumber(value)) {
-        value = number(value)
-    }
-
-    // Format memory size in KB, MB, or GB based on value
-    if (value < 1) {
-        return string(value * 1024) + " KB"
-    elseif (value < 1024)
-        return string(value) + " MB"
-    else
-        return string(value / 1024) + " GB"
-    }
+// Helper function to format size values
+func formatSize(size) {
+	if size < 1024
+		return string(size) + " K"
+	ok
+	if size < 1024 * 1024
+		return string(size / 1024) + " M"
+	ok
+	if size < 1024 * 1024 * 1024
+		return string(size / (1024 * 1024)) + " G"
+	ok
+	return string(size / (1024 * 1024 * 1024)) + " T"
 }
 
 // Window closing event handler
