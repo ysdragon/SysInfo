@@ -405,7 +405,7 @@ class SysInfo {
             for path in dmiPaths {
                 if (fexists(path)) {
                     fileContent = trim(readFile(path))
-                    if (!isNull(fileContent) and len(fileContent) > 0) {
+                    if (!isNull(fileContent) && len(fileContent) > 0) {
                         model = substr(fileContent, nl, "")
                         return model
                     }
@@ -539,7 +539,7 @@ class SysInfo {
             
             // First get CPU model
             for line in lines {
-                if (substr(line, "model name") and modelName = "") {
+                if (substr(line, "model name") && modelName = "") {
                     colonPos = substr(line, ":")
                     if (colonPos > 0) {
                         modelName = trim(substr(line, colonPos + 1))
@@ -728,7 +728,7 @@ class SysInfo {
             // Initialize shellVersion
             shellVersion = "Unknown"
             // Skip version check for sh and dash shells since they don't support --version
-            if !(shell[:name] = "sh" or shell[:name] = "dash") {
+            if !(shell[:name] = "sh" || shell[:name] = "dash") {
                 // Execute the shell with the version argument to retrieve the shell version
                 shellVersion = systemCmd(shellInfo + " --version")
             }
@@ -843,7 +843,7 @@ class SysInfo {
     // Helper function to calculate uptime based on uptimeInfo and the given params list
     func calcUptime(uptimeInfo, params) {
         // Set default parameter values if not provided, not a list, or the list is empty
-        if (!isList(params) or len(params) = 0) {
+        if (!isList(params) || len(params) = 0) {
             params = [:days = 1, :hours = 1, :minutes = 1, :seconds = 1]
         }
         
@@ -855,7 +855,7 @@ class SysInfo {
         for tUnit in tUnits {
             if (params[tUnit[3]] = 1) {
                 value = floor(totalSeconds / tUnit[1])
-                if (value > 0 or len(fUptime) > 0) {
+                if (value > 0 || len(fUptime) > 0) {
                     if (len(fUptime) > 0) {
                         fUptime += ", "
                     }
@@ -961,7 +961,7 @@ class SysInfo {
                     diskSize = number(bytesStr) / 1024
 
                     // Only add if disk name and size are valid
-                    if (!isNull(currentDisk) and diskSize > 0) {
+                    if (!isNull(currentDisk) && diskSize > 0) {
                         add(blockDevices, [:name = currentDisk, :size = diskSize])
                     }
 
@@ -1027,7 +1027,7 @@ class SysInfo {
         lines = split(output, nl)
         
         for line in lines {
-            if (!isNull(line) and len(trim(line)) > 0) {
+            if (!isNull(line) && len(trim(line)) > 0) {
                 // Parse each line of ip addr output
                 parts = split(line, " ")
                 
@@ -1046,7 +1046,7 @@ class SysInfo {
                     ipAddress = ipParts[1]
                     
                     // Skip loopback unless it's the only interface
-                    if (interfaceName = "lo" and len(interfaces) > 0) {
+                    if (interfaceName = "lo" && len(interfaces) > 0) {
                         loop
                     }
                     
@@ -1095,8 +1095,8 @@ class SysInfo {
                 if (colonPos > 0) {
                     potentialName = left(trimmed_line, colonPos - 1)
                     // Ensure potentialName is a valid interface name
-                    if (len(potentialName) > 0 and !substr(potentialName, " ")) {
-                        if lower(potentialName) != "status" and lower(potentialName) != "media" and lower(potentialName) != "options" and lower(potentialName) != "ether" and lower(potentialName) != "groups" {
+                    if (len(potentialName) > 0 && !substr(potentialName, " ")) {
+                        if (lower(potentialName) != "status" && lower(potentialName) != "media" && lower(potentialName) != "options" && lower(potentialName) != "ether" && lower(potentialName) != "groups") {
                            isInterfaceLine = true
                         }
                     }
@@ -1104,7 +1104,7 @@ class SysInfo {
             }
 
             if (isInterfaceLine) {
-                if (!isNull(currentInterface) and !isNull(currentIP)) {
+                if (!isNull(currentInterface) && !isNull(currentIP)) {
                     add(interfaces, [
                         :name = currentInterface,
                         :ip = currentIP,
@@ -1116,7 +1116,7 @@ class SysInfo {
                 currentInterface = left(trimmed_line, colonPos - 1)
                 currentIP = ""
             
-            elseif (!isNull(currentInterface) and (substr(trimmed_line, "inet ") or substr(trimmed_line, "inet addr:")))
+            elseif (!isNull(currentInterface) && (substr(trimmed_line, "inet ") || substr(trimmed_line, "inet addr:")))
                 ipLineContent = ""
                 if (substr(trimmed_line, "inet addr:")) {
                     ipLineContent = trim(substr(trimmed_line, substr(trimmed_line, "inet addr:") + len("inet addr:")))
@@ -1133,7 +1133,7 @@ class SysInfo {
                         tempIP = ipLineContent
                     }
                     
-                    if (!substr(tempIP, ":") and currentIP = "") {
+                    if (!substr(tempIP, ":") && currentIP = "") {
                         currentIP = tempIP
                     }
                 }
@@ -1141,7 +1141,7 @@ class SysInfo {
         }
         
         // Add the last interface found, if it has an IP
-        if (!isNull(currentInterface) and !isNull(currentIP)) {
+        if (!isNull(currentInterface) && !isNull(currentIP)) {
             add(interfaces, [
                 :name = currentInterface,
                 :ip = currentIP,
