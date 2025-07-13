@@ -814,10 +814,10 @@ class SysInfo {
             
             // Process FreeBSD memory info - store raw values
             if (len(memInfoLines) >= 4) {
-                physmem = number(memInfoLines[1])
-                freeCount = number(memInfoLines[2])
-                pageSize = number(memInfoLines[3])
-                swapTotal = number(memInfoLines[4])
+                physmem = number(memInfoLines[1]) / 1024
+                freeCount = number(memInfoLines[2]) / 1024
+                pageSize = number(memInfoLines[3]) / 1024
+                swapTotal = number(memInfoLines[4]) / 1024
                 
                 memInfo = [
                     physmem,
