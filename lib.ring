@@ -920,19 +920,42 @@ class SysInfo {
     func storageInfo() {
         // Initialize the blockDevices list
         blockDevices = []
-        
-        try {
-            // Execute command to get storage info
-            storageInfo = systemCmd("lsblk --json -o NAME,SIZE,FSTYPE,MOUNTPOINT")
-            
-            // Convert json to list
-            storageInfo = json2List(storageInfo)
-            
-            // Get blockdevices from StorageInfo
-            blockDevices = storageInfo[:blockdevices]
-        catch
-            // Handle errors
-            ? "Error: " + cCatchError
+
+        // Read /proc/partitions to get block devices
+        storageInfo = readFile("/proc/partitions")
+
+        // Split the storageInfo by newlines
+        aLines = split(storageInfo, nl)
+
+        // Start loop after the header lines
+        for i = 3 to len(aLines) {
+            cLine = trim(aLines[i])
+
+            // Skip empty lines
+            if (!len(cLine)) {
+                continue
+            }
+
+            // Split the line into columns
+            aParts = split(cLine, " ")
+
+            // A valid disk line should have 4 parts
+            if (len(aParts) = 4) {
+                cName = aParts[4]
+                nSize = number(aParts[3])
+
+                // Check if the last character of the name is NOT a digit
+                // This identifies parent disks like 'sda', 'sdb', 'nvme0n1'
+                cLastChar = right(cName, 1)
+                if (!isdigit(cLastChar)) {
+                    // Create a structured list for this disk
+                    aDiskInfo = [
+                        :name = cName,
+                        :size = nSize
+                    ]
+                    add(blockDevices, aDiskInfo)
+                }
+            }
         }
 
         // Return blockDevices
