@@ -54,13 +54,6 @@ $RAM = @{
     free = $FREE_RAM
     swap = $TOTAL_SWAP
 }
-function Format-Size($bytes) {
-    if ($bytes -ge 1TB) { return [math]::round($bytes / 1TB, 2).ToString() + 'T' }
-    elseif ($bytes -ge 1GB) { return [math]::round($bytes / 1GB, 2).ToString() + 'G' }
-    elseif ($bytes -ge 1MB) { return [math]::round($bytes / 1MB, 2).ToString() + 'M' }
-    elseif ($bytes -ge 1KB) { return [math]::round($bytes / 1KB, 2).ToString() + 'K' }
-    else { return $bytes.ToString() + 'B' }
-}
 $DISKS_RAW = Get-CimInstance -Query 'SELECT Size, DeviceID, Model FROM Win32_DiskDrive'
 $DISKS = @()
 foreach ($DISK in $DISKS_RAW) {
