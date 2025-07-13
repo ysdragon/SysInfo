@@ -308,17 +308,8 @@ class SysInfo {
                         partUsed = partInfo[3]
                         partFree = partInfo[4]
                         
-                        // Filter out virtual/temporary filesystems
-                        shouldSkip = false
-                        for filtered in filteredStorageParts {
-                            if (partName = filtered) {
-                                shouldSkip = true
-                                break
-                            }
-                        }
-                        
-                        if (!shouldSkip) {
-                            // Add partition to storageParts
+                        // Only add if not in filteredStorageParts
+                        if (!find(filteredStorageParts, partName)) {
                             add(storageParts, [:name = partName, :size = partSize, :used = partUsed, :free = partFree])
                         }
                     }
