@@ -289,7 +289,7 @@ class SysInfo {
             storageParts = winSysInfo[:parts]
         else // Else (If the OS is Unix-like)
             // Get partition information using df
-            partOutput = systemCmd("df -h")
+            partOutput = systemCmd("df -k")
             // Split the output by newlines
             partLines = split(partOutput, nl)
             
