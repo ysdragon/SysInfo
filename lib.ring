@@ -233,13 +233,7 @@ class SysInfo {
             storageDisks = winSysInfo[:disks]
         elseif (isLinux()) // If the OS is Linux
             // Get blockdevices from StorageInfo
-            blockDevices = storageInfo()
-            
-            // Loop in every blockdevice in blockDevices
-            for blockDevice in blockDevices {
-                // Add blockDevice name and size to StorageDisks
-                add(storageDisks, [:name = blockDevice[:name], :size = blockDevice[:size]])
-            }
+            storageDisks = storageInfo() 
         elseif (isFreeBSD()) // If the OS is FreeBSD
             // Use geom to get disk information
             diskOutput = systemCmd("geom disk list")
