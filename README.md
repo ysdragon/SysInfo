@@ -72,8 +72,8 @@ sys = new SysInfo
 // Get basic system information
 ? "OS: " + sys.os()[:name]
 ? "Hostname: " + sys.hostname()
-? "CPU: " + sys.cpu()[:model]
-? "Total RAM: " + (sys.ram()[:size] / 1024) + " GB"
+? "CPU: " + sys.cpu([])[:model]
+? "Total RAM: " + (sys.ram()[:size] / 1024 / 1024) + " GB"
 ```
 
 For detailed API documentation, please refer to the [SysInfo Package Documentation](./docs/API.md).

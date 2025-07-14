@@ -12,7 +12,7 @@ sys = new SysInfo
 // Get basic system information
 ? "OS: " + sys.os()[:name]
 ? "Hostname: " + sys.hostname()
-? "CPU: " + sys.cpu()[:model]
+? "CPU: " + sys.cpu([])[:model]
 ? "Total RAM: " + (sys.ram()[:size] / 1024 / 1024) + " GB" // Note: RAM size is in KB
 ```
 
