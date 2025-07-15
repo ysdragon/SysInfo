@@ -3,6 +3,9 @@
 */
 
 // PowerShell Script for Windows
+// This script is executed on Windows to gather various system information.
+// It retrieves details about the CPU, GPU, RAM, OS, disks, partitions, installed programs,
+// shell, network interfaces, and virtualization status.
 PS_SCRIPT = `$MODEL = (Get-CimInstance -ClassName Win32_ComputerSystem).Model
 $CPU_INFO = (Get-CimInstance -Query 'SELECT Name, NumberOfCores, NumberOfLogicalProcessors FROM Win32_Processor')
 $CPU_USAGE = (Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 1 -MaxSamples 1).CounterSamples.CookedValue
@@ -109,6 +112,8 @@ $Result = @{
 Write-Output (ConvertTo-Json $Result -Depth 4)`
 
 // Time units
+// Defines time units used for formatting system uptime in a human-readable format.
+// Each entry contains: [duration in seconds, singular unit name, unit key for parameters].
 tUnits = [
 	[86400, "day", :days],
 	[3600, "hour", :hours],
@@ -117,6 +122,8 @@ tUnits = [
 ]
 
 // Linux Package Managers
+// Maps Linux distribution IDs to their package managers and commands for counting installed packages.
+// This enables cross-distribution package count retrieval.
 pManagers = [
 	:dpkg = [
 		:supported = [
@@ -197,7 +204,8 @@ pManagers = [
 	]
 ]
 
-// Virtualization indicators list 
+// Virtualization indicators list
+// Contains keywords and phrases used to detect if the system is running in a virtualized environment (VM).
 virtIndicators = [
 	"kvm",
 	"qemu",
@@ -218,9 +226,10 @@ virtIndicators = [
 ]
 
 // Storage parts to filter out (temporary filesystems, virtual filesystems, etc.)
+// These entries are excluded from the storageParts() function output to provide cleaner results.
 filteredStorageParts = [
 	"tmpfs",
-	"devtmpfs", 
+	"devtmpfs",
 	"dev",
 	"devfs",
 	"run",
