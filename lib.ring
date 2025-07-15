@@ -880,7 +880,7 @@ class SysInfo {
         if isWindows() {
             // Get block devices from winSysInfo
             blockDevices = winSysInfo[:disks]
-        elseif(isLinux())
+        elseif (isLinux())
             // Read /proc/partitions to get block devices
             storageInfo = readFile("/proc/partitions")
 

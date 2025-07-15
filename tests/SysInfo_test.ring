@@ -102,7 +102,7 @@ class SysInfoTest {
         assert(number(firstCPU[:threads]) > 0, "CPU specific threads should be greater than 0")
 
         if (!sysInfo.isVM()) {
-            assert(isNull(cpuInfo[:temp]) or (type(cpuInfo[:temp]) = "NUMBER" and cpuInfo[:temp] >= 20 and cpuInfo[:temp] <= 100), "CPU temperature should be null or between 20-100°C")
+            assert(isNull(cpuInfo[:temp]) || (type(cpuInfo[:temp]) = "NUMBER" && cpuInfo[:temp] >= 20 && cpuInfo[:temp] <= 100), "CPU temperature should be null or between 20-100°C")
         }
     }
 
@@ -189,7 +189,7 @@ class SysInfoTest {
     func testIsVM() {
         ? "Testing isVM()..."
         isVM = sysInfo.isVM()
-        assert(isBoolean(isVM) or isNull(isVM), "isVM should be boolean or null")
+        assert(isBoolean(isVM) || isNull(isVM), "isVM should be boolean or null")
     }
 
     func testNetwork() {
@@ -207,6 +207,6 @@ class SysInfoTest {
 
     // Helper function to check if value is boolean
     func isBoolean(value) {
-        return type(value) = "NUMBER" and (value = 0 or value = 1)
+        return type(value) = "NUMBER" && (value = 0 || value = 1)
     }
 }

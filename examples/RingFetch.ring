@@ -1,9 +1,9 @@
 /*
-    RingFetch - A system information display tool
-    Author: ysdragon (https://github.com/ysdragon)
-    
-    This example demonstrates how to use the SysInfo package to gather
-    and display comprehensive system information in a formatted output.
+	RingFetch - A system information display tool
+	Author: ysdragon (https://github.com/ysdragon)
+	
+	This example demonstrates how to use the SysInfo package to gather
+	and display comprehensive system information in a formatted output.
 */
 
 // Load the SysInfo package
@@ -69,11 +69,11 @@ cpuCount = cpuInfo[:count]
 
 // Format CPU model display based on CPU count
 if (cpuCount > 1) {
-    // Multiple CPUs: show count prefix (e.g., "2x Intel Core i7...")
-    cpuModel = string(cpuCount) + "x " + cpuInfo[:model]
+	// Multiple CPUs: show count prefix (e.g., "2x Intel Core i7...")
+	cpuModel = string(cpuCount) + "x " + cpuInfo[:model]
 else
-    // Single CPU: show model name only
-    cpuModel = cpuInfo[:model]
+	// Single CPU: show model name only
+	cpuModel = cpuInfo[:model]
 }
 
 // Get CPU specifications
@@ -82,10 +82,10 @@ cpuThreads = cpuInfo[:threads] // Total number of logical processors
 cpuUsage = string(cpuInfo[:usage]) + "%" // Current usage percentage
 
 // Get CPU temperature (available on Unix-like systems, non-VM environments)
-if(isUnix() && !sys.isVM()) {
-    cpuTemp = ", Temp " + cpuInfo[:temp] + "°"
+if (isUnix() && !sys.isVM()) {
+	cpuTemp = ", Temp " + cpuInfo[:temp] + "°"
 else
-    cpuTemp = NULL // Temperature not available on Windows or VMs
+	cpuTemp = NULL // Temperature not available on Windows or VMs
 }
 
 // ===========================================
@@ -107,11 +107,11 @@ freeRam = formatSize(sys.ram()[:free])   // Available free RAM
 // Handle swap/pagefile information based on operating system
 swapRam = NULL
 if (isWindows()) {
-    // Windows uses pagefile for virtual memory
-    swapRam = "Pagefile: " + formatSize(sys.ram()[:swap])
+	// Windows uses pagefile for virtual memory
+	swapRam = "Pagefile: " + formatSize(sys.ram()[:swap])
 elseif (isUnix())
-    // Unix-like systems use swap partitions/files
-    swapRam = "Swap: " + formatSize(sys.ram()[:swap])
+	// Unix-like systems use swap partitions/files
+	swapRam = "Swap: " + formatSize(sys.ram()[:swap])
 }
 
 // ===========================================
@@ -152,29 +152,29 @@ disks = sys.storageDisks()
 // ===========================================
 
 print("
-    **                     RingFetch                     **
-    **   Author: ysdragon (https://github.com/ysdragon)  **
+	**                     RingFetch                     **
+	**   Author: ysdragon (https://github.com/ysdragon)  **
 
-    OS: #{osName}
-    Host: #{model}
-    Hostname: #{hostname}
-    Username: #{username}
-    Shell: #{shell}
-    Arch: #{arch}
-    Kernel: #{version}
-    Packages: #{pcount}
-    CPU: #{cpuModel} Cores: #{cpuCores}, Threads: #{cpuThreads}, Usage: #{cpuUsage}#{cpuTemp}
-    GPU: #{gpu}
-    RAM: Size: #{totalRam}, Used: #{usedRam}, Free: #{freeRam}, #{swapRam}
-    Uptime: #{uptime}
+	OS: #{osName}
+	Host: #{model}
+	Hostname: #{hostname}
+	Username: #{username}
+	Shell: #{shell}
+	Arch: #{arch}
+	Kernel: #{version}
+	Packages: #{pcount}
+	CPU: #{cpuModel} Cores: #{cpuCores}, Threads: #{cpuThreads}, Usage: #{cpuUsage}#{cpuTemp}
+	GPU: #{gpu}
+	RAM: Size: #{totalRam}, Used: #{usedRam}, Free: #{freeRam}, #{swapRam}
+	Uptime: #{uptime}
 ")
 
 // Display physical storage devices
 print("    Storage Disks: \n")
 for disk in disks {
-    diskName = disk[:name]  // Device model/name
-    diskSize = formatSize(disk[:size])  // Device capacity
-    print("             #{diskName} Size: #{diskSize}\n")
+	diskName = disk[:name]  // Device model/name
+	diskSize = formatSize(disk[:size])  // Device capacity
+	print("             #{diskName} Size: #{diskSize}\n")
 }
 
 // ===========================================
@@ -185,18 +185,18 @@ for disk in disks {
 // Each partition contains: name, size, used space, free space
 storageParts = sys.storageParts()
 print("    Storage Parts: \n")
-if (isList(storageParts) and len(storageParts) > 0) {
-    for part in storageParts {
-        if (isList(part)) {
-            partName = part[:name]  // Mount point or drive letter
-            partSize = formatSize(part[:size])  // Total partition size
-            partUsed = formatSize(part[:used])  // Used space
-            partFree = formatSize(part[:free])  // Available free space
-            print("             #{partName} Size: #{partSize}, Used: #{partUsed}, Free: #{partFree}\n")
-        }
-    }
+if (isList(storageParts) && len(storageParts) > 0) {
+	for part in storageParts {
+		if (isList(part)) {
+			partName = part[:name]  // Mount point or drive letter
+			partSize = formatSize(part[:size])  // Total partition size
+			partUsed = formatSize(part[:used])  // Used space
+			partFree = formatSize(part[:free])  // Available free space
+			print("             #{partName} Size: #{partSize}, Used: #{partUsed}, Free: #{partFree}\n")
+		}
+	}
 else
-    print("             No storage parts detected\n")
+	print("             No storage parts detected\n")
 }
 
 // ===========================================
@@ -207,17 +207,17 @@ else
 // Each interface contains: name, IP address, status
 networkInfo = sys.network()
 print("    Network Interfaces: \n")
-if (isList(networkInfo) and len(networkInfo) > 0) {
-    for interface in networkInfo {
-        if (isList(interface)) {
-            interfaceName = interface[:name]      // Interface description/name
-            interfaceIP = interface[:ip]          // Assigned IP address
-            interfaceStatus = interface[:status]  // Connection status
-            print("             #{interfaceName} - IP: #{interfaceIP}, Status: #{interfaceStatus}\n")
-        }
-    }
+if (isList(networkInfo) && len(networkInfo) > 0) {
+	for interface in networkInfo {
+		if (isList(interface)) {
+			interfaceName = interface[:name]      // Interface description/name
+			interfaceIP = interface[:ip]          // Assigned IP address
+			interfaceStatus = interface[:status]  // Connection status
+			print("             #{interfaceName} - IP: #{interfaceIP}, Status: #{interfaceStatus}\n")
+		}
+	}
 else
-    print("             No network interfaces detected\n")
+	print("             No network interfaces detected\n")
 }
 
 // ===========================================
@@ -226,14 +226,13 @@ else
 
 // Helper function to format size values
 func formatSize(size) {
-	if size < 1024
+	if (size < 1024) {
 		return string(size) + " K"
-	ok
-	if size < 1024 * 1024
+	elseif (size < 1024 * 1024)
 		return string(size / 1024) + " M"
-	ok
-	if size < 1024 * 1024 * 1024
+	elseif (size < 1024 * 1024 * 1024)
 		return string(size / (1024 * 1024)) + " G"
-	ok
-	return string(size / (1024 * 1024 * 1024)) + " T"
+	else
+		return string(size / (1024 * 1024 * 1024)) + " T"
+	}
 }
