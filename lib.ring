@@ -582,8 +582,14 @@ class SysInfo {
 			
 			// Set CPU info
 			physicalCPUCount = len(physicalIDs)
-			if physicalCPUCount = 0 { physicalCPUCount = 1 }
-			if coresPerCPU = 0 { coresPerCPU = 1 }
+			
+			if (physicalCPUCount = 0) {
+				physicalCPUCount = 1 
+			}
+
+			if (coresPerCPU = 0) {
+				coresPerCPU = 1 
+			}
 
 			cpuInfo[:model] = modelName
 			cpuInfo[:count] = physicalCPUCount
@@ -877,7 +883,7 @@ class SysInfo {
 		// Initialize the blockDevices list
 		blockDevices = []
 
-		if isWindows() {
+		if (isWindows()) {
 			// Get block devices from winSysInfo
 			blockDevices = winSysInfo[:disks]
 		elseif (isLinux())
