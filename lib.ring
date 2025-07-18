@@ -424,6 +424,28 @@ class SysInfo {
 					}
 				}
 			}
+		elseif (isMacOSX()) // If the OS is macOS
+			// Check CPU features for hypervisor flag
+			cpuFeatures = systemCmd("sysctl -n machdep.cpu.features")
+			if (substr(lower(cpuFeatures), "vmm")) {
+				return true
+			}
+
+			// Check I/O Registry for virtual hardware identifiers
+			vmIdentifiers = systemCmd("ioreg -l")
+			if (!isNull(vmIdentifiers)) {
+				// Loop through each virtualization indicator
+				for indicator in virtIndicators {
+					lowerIndicator = lower(indicator)
+					lowerVmIdentifiers = lower(vmIdentifiers)
+					
+					// Check if the indicator is found in vmIdentifiers
+					if (substr(lowerVmIdentifiers, lowerIndicator)) {
+						// Return true if a match is found
+						return true
+					}
+				}
+			}
 		elseif (isFreeBSD()) // If the OS is FreeBSD
 			// Check if the system is running in a VM
 			vmInfo = systemCmd("sysctl -n kern.vm_guest")
