@@ -583,7 +583,7 @@ class SysInfo {
 					kVersion = left(vSubstring, vEndIndex - 1)
 				}
 			}
-		elseif (isFreeBSD()) // If the OS is FreeBSD
+		elseif (isFreeBSD() || isMacOSX()) // If the OS is FreeBSD or macOS
 			// Get the Kernel version using sysctl
 			kInfo = systemCmd("sysctl kern.osrelease")
 			// Split the output by ":"
