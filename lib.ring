@@ -370,10 +370,13 @@ class SysInfo {
 	}
 
 	// Method to get Package/Program count
-	func pCount() {
-		// Default pCount value
-		pCount = "Unknown"
-
+	func packageManager() {
+		// Initialize pInfo list
+		pInfo = [
+			:name = "Unknown",
+			:count = "Unknown"
+		]
+		
 		// Check if the OS is Windows
 		if (isWindows()) {
 			// Get installed programs count from winSysInfo
