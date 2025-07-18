@@ -6,7 +6,7 @@
 	and the SysInfo package.
 	
 	Features:
-	- System Overview (hostname, username, OS info, environment)
+	- System Overview (model, hostname, username, OS info, environment)
 	- Hardware Information (CPU, RAM, GPU with temperature monitoring)
 	- Storage Information (physical disks and mounted partitions)
 	- Network Interfaces (active network connections with IP addresses)
@@ -34,7 +34,8 @@ func main() {
 	osName = sys.os()[:name]
 	arch = sys.arch()
 	kernelVer = sys.version()
-	pcount = sys.pCount()
+	packageManager = sys.packageManager()
+	packageManager = string(packageManager[:count]) + " (" + packageManager[:name] + ")"
 	uptime = sys.sysUptime([])
 
 	// CPU information with performance metrics
@@ -134,8 +135,7 @@ func main() {
 	envForm = uiNewForm()
 	uiFormSetPadded(envForm, 1)
 	uiFormAppend(envForm, "Shell:", uiControl(uiNewLabel(shell)), 0)
-	uiFormAppend(envForm, "Installed Packages:", uiControl(uiNewLabel(string(pcount))), 0)
-
+	uiFormAppend(envForm, "Installed Packages:", uiControl(uiNewLabel(packageManager)), 0)
 	uiBoxAppend(envBox, uiControl(envForm), 1)
 	uiGroupSetChild(envGroup, uiControl(envBox))
 	uiBoxAppend(sysInfoPage, uiControl(envGroup), 0)

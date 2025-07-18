@@ -136,10 +136,11 @@ uptime = sys.sysUptime([]) // Auto-format based on uptime duration
 // SOFTWARE PACKAGES
 // ===========================================
 
-// Get installed package/program count
+// Get installed packageManager info
 // Unix-like: packages from package manager
 // Windows: installed programs from registry
-pcount = sys.pCount()
+packageManager = sys.packageManager()
+packageManager = string(packageManager[:count]) + " (" + packageManager[:name] + ")"
 
 // ===========================================
 // STORAGE INFORMATION
@@ -168,7 +169,7 @@ print("
 	Shell: #{shell}
 	Arch: #{arch}
 	Kernel: #{version}
-	Packages: #{pcount}
+	Packages: #{packageManager}
 	CPU: #{cpuModel} Cores: #{cpuCores}, Threads: #{cpuThreads}, Usage: #{cpuUsage}#{cpuTemp}
 	GPU: #{gpu}
 	RAM: Size: #{totalRam}, Used: #{usedRam}, Free: #{freeRam}, #{swapRam}
