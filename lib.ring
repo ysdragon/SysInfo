@@ -115,6 +115,66 @@ class SysInfo {
 			else  // If there's no GPU detected
 				gpuName = "No GPU detected!"
 			}
+		elseif (isMacOSX())
+			try {
+				// Execute command to get GPU name
+				gpuInfo = systemCmd("system_profiler SPDisplaysDataType")
+
+				// Check if no GPU detected
+				if (isNull(gpuInfo)) {
+					return "No GPU detected"
+				}
+
+				gpuLines = split(gpuInfo, nl)
+				gpus = []
+				for line in gpuLines {
+					trimmedLine = trim(line)
+					if (substr(trimmedLine, "Chipset Model:")) {
+						chipsetModel = trim(split(trimmedLine, ":")[2])
+						if (!find(gpus, chipsetModel)) {
+							add(gpus, chipsetModel)
+						}
+					}
+				}
+
+				if (len(gpus) = 0) {
+					for i = 1 to len(gpuLines) {
+						line = gpuLines[i]
+						trimmedLine = trim(line)
+						if (substr(line, 1, 4) = "    " && substr(line, 1, 5) != "     " && right(trimmedLine, 1) = ":") {
+							// Look ahead for "Type: GPU"
+							limit = i + 5
+							if (limit > len(gpuLines)) {
+								limit = len(gpuLines)
+							}
+							for j = i + 1 to limit {
+								nextLine = gpuLines[j]
+								if (substr(trim(nextLine), "Type: GPU")) {
+									deviceName = left(trimmedLine, len(trimmedLine) - 1)
+									if (!find(gpus, deviceName)) {
+										add(gpus, deviceName)
+									}
+									break
+								}
+							}
+						}
+					}
+				}
+
+				if (len(gpus) > 1) {
+					gpuName = ""
+					for i = 1 to len(gpus) {
+						gpuName += "GPU" + i + ": " + gpus[i] + " "
+					}
+				elseif (len(gpus) = 1)
+					gpuName = gpus[1]
+				else
+					gpuName = "No GPU detected!"
+				}
+
+			catch // If an error occurred
+				return "An error occurred while fetching GPU information: " + cCatchError
+			}
 		else // Else (If the OS is (Unix-like))
 			try {
 				// Check if pciutils is installed
