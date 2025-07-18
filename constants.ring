@@ -197,7 +197,7 @@ pManagers = [
 	],
 	:brew = [
 		:supported = [
-			"any"
+			"macos"
 		],
 		:cmd = "brew list | wc -l",
 		:name = "brew"
