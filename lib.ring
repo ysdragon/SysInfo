@@ -1273,7 +1273,7 @@ class SysInfo {
 				// Return empty list on error
 				return []
 			}
-		elseif (isFreeBSD()) // If the OS is FreeBSD
+		elseif (isFreeBSD() || isMacOSX()) // If the OS is FreeBSD or macOS
 			// Use ifconfig for FreeBSD
 			try {
 				interfaceOutput = systemCmd("ifconfig")
