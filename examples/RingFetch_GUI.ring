@@ -29,7 +29,8 @@ func main() {
 	// Basic system identification
 	hostname = sys.hostname()
 	username = sys.username()
-	shell = sys.shell()[:name] + " " + sys.shell()[:version]
+	shell = sys.shell()
+	shell = shell[:name] + " " + shell[:version]
 	osName = sys.os()[:name]
 	arch = sys.arch()
 	kernelVer = sys.version()
@@ -44,10 +45,11 @@ func main() {
 	cpuUsage = string(cpuInfo[:usage]) + "%"
 
 	// Memory statistics
-	totalRam = sys.ram()[:size]
-	usedRam = sys.ram()[:used]
-	freeRam = sys.ram()[:free]
-	swapRam = sys.ram()[:swap]
+	ram = sys.ram()
+	totalRam = ram[:size]
+	usedRam = ram[:used]
+	freeRam = ram[:free]
+	swapRam = ram[:swap]
 
 	// Graphics hardware information
 	gpuInfo = sys.gpu()
@@ -280,7 +282,7 @@ func main() {
 		uiBoxAppend(partsBox, uiControl(partForm), 0)
 		
 		for part in parts {
-			if (isList(part)) {
+			if (isList(part) && part[:size] > 0) {
 				partName = part[:name]
 				partSize = formatSize(part[:size])
 				partUsed = formatSize(part[:used])

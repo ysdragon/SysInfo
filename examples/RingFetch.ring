@@ -29,7 +29,8 @@ username = sys.username()
 // Example usage for individual components:
 //   shellName = sys.shell()[:name]     // Shell name only
 //   shellVersion = sys.shell()[:version] // Shell version only
-shell = sys.shell()[:name] + " " + sys.shell()[:version]
+shell = sys.shell()
+shell = shell[:name] + " " + shell[:version]
 
 // Get terminal emulator information (Unix-like systems only)
 // Uncomment the line below if you need terminal detection
@@ -100,18 +101,23 @@ gpu = sys.gpu()
 // ===========================================
 
 // Retrieve memory statistics
-totalRam = formatSize(sys.ram()[:size])  // Total installed RAM
-usedRam = formatSize(sys.ram()[:used])   // Currently used RAM
-freeRam = formatSize(sys.ram()[:free])   // Available free RAM
+ram = sys.ram()
+totalRam = formatSize(ram[:size])  // Total installed RAM
+usedRam = formatSize(ram[:used])   // Currently used RAM
+freeRam = formatSize(ram[:free])   // Available free RAM
 
 // Handle swap/pagefile information based on operating system
-swapRam = NULL
-if (isWindows()) {
-	// Windows uses pagefile for virtual memory
-	swapRam = "Pagefile: " + formatSize(sys.ram()[:swap])
-elseif (isUnix())
-	// Unix-like systems use swap partitions/files
-	swapRam = "Swap: " + formatSize(sys.ram()[:swap])
+swapRam = ram[:swap]
+if (swapRam > 0) {
+	if (isWindows()) {
+		// Windows uses pagefile for virtual memory
+		swapRam = "Pagefile: " + formatSize(swapRam)
+	elseif (isUnix())
+		// Unix-like systems use swap partitions/files
+		swapRam = "Swap: " + formatSize(swapRam)
+	}
+else 
+	swapRam = "Swap: " + swapRam
 }
 
 // ===========================================
@@ -187,7 +193,7 @@ storageParts = sys.storageParts()
 print("    Storage Parts: \n")
 if (isList(storageParts) && len(storageParts) > 0) {
 	for part in storageParts {
-		if (isList(part)) {
+		if (isList(part) && part[:size] > 0) {
 			partName = part[:name]  // Mount point or drive letter
 			partSize = formatSize(part[:size])  // Total partition size
 			partUsed = formatSize(part[:used])  // Used space
