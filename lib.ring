@@ -379,20 +379,30 @@ class SysInfo {
 		
 		// Check if the OS is Windows
 		if (isWindows()) {
-			// Get installed programs count from winSysInfo
-			pCount = winSysInfo[:pcount]
-		else // Else (If the OS is (Unix-like))
-			// Loop through every package manager
-			for pManager in pManagers {
-				// If your OS is supported get pCount
-				if (find(pManager[2][:supported], osInfo()[:id])) {
-					pCount = systemCmd(pManager[2][:cmd]) + " (" + pManager[2][:name] + ")"                    
-				}
+			pInfo[:name] = "Programs"
+			pInfo[:count] = winSysInfo[:pcount]
+			return pInfo
+		}
+
+		// Get OS info once
+		osId = osInfo()[:id]
+
+		// Try to find a supported package manager for this OS
+		for pManager in pManagers {
+			if (find(pManager[2][:supported], osId)) {
+				pInfo[:name] = pManager[2][:name]
+				pInfo[:count] = trim(systemCmd(pManager[2][:cmd]))
+				return pInfo
 			}
 		}
 
-		// Return package count
-		return pCount
+		// Fallback for other Linux/Unix-like systems
+		if (pInfo[:count] = "Unknown") {
+			pInfo[:name] = pManagers[:bin][:name]
+			pInfo[:count] = trim(systemCmd(pManagers[:bin][:cmd]))
+		}
+		
+		return pInfo
 	}
 	
 	// Method to check if the machine is a VM
