@@ -739,6 +739,30 @@ class SysInfo {
 				}
 			}
 		
+		elseif (isMacOSX()) // If the OS is macOS
+			// Get CPU info using sysctl
+			cpuInfo[:model] = trim(systemCmd("sysctl -n machdep.cpu.brand_string"))
+			cpuInfo[:count] = number(trim(systemCmd("sysctl -n hw.packages")))
+			cpuInfo[:cores] = string(number(trim(systemCmd("sysctl -n hw.physicalcpu"))))
+			cpuInfo[:threads] = string(number(trim(systemCmd("sysctl -n hw.logicalcpu"))))
+
+			// Initialize CPU specific info
+			cpuInfo[:cpus] = []
+			add(cpuInfo[:cpus], [
+				:number = 1,
+				:model = cpuInfo[:model],
+				:cores = cpuInfo[:cores],
+				:threads = cpuInfo[:threads]
+			])
+
+			// Get CPU usage and temperature if requested
+			if (getUsage) {
+				// Get CPU usage
+				cpuInfo[:usage] = systemCmd("ps -ax -o %cpu | awk '{s+=$1} END {print s}'")
+				
+				// CPU Temp is not reliably available on macOS via sysctl
+				cpuInfo[:temp] = NULL
+			}
 		elseif (isFreeBSD()) // If the OS is FreeBSD
 			// Get CPU info using sysctl
 			cpuOutput = systemCmd("sysctl -n hw.model hw.ncpu")
