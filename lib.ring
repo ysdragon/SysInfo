@@ -1127,6 +1127,66 @@ class SysInfo {
 					}
 				}
 			}
+		elseif (isMacOSX())
+			output = systemCmd("diskutil list")
+			lines = split(output, nl)
+
+			currentDisk = ""
+			for line in lines {
+				trimmedLine = trim(line)
+
+				// Find a line that identifies a physical disk.
+				if (substr(trimmedLine, "(internal, physical):")) {
+					// The disk identifier (e.g., /dev/disk0) is the first part of the line.
+					currentDisk = split(trimmedLine, " ")[1]
+					continue // Move to the next line to find the size info.
+				}
+
+				// Look for the "0:" line describing the entire disk after finding a physical disk
+				if (!isNull(currentDisk) && substr(trimmedLine, "0:")) {
+					parts = split(trimmedLine, " ")
+					
+					sizeStr = ""
+					unit = ""
+					
+					// Find the size and its unit (GB, MB, TB) in the sanitized parts
+					for i = 1 to len(parts) {
+						part = parts[i]
+						if (part = "GB" || part = "MB" || part = "TB") {
+							unit = part
+							sizeStr = parts[i-1]
+							break
+						}
+					}
+					
+					// If a valid size and unit were found, convert to KB and store it.
+					if (!isNull(unit)) {
+						// Remove the asterisk that sometimes appears before the size
+						if (substr(sizeStr, "*")) {
+							sizeStr = right(sizeStr, len(sizeStr) - 1)
+						}
+
+						sizeNum = number(sizeStr)
+						sizeKB = 0
+						
+						if (unit = "TB") {
+							// Convert Terabytes to Kilobytes
+							sizeKB = floor(sizeNum * 1024 * 1024 * 1024)
+						elseif (unit = "GB")
+							// Convert Gigabytes to Kilobytes
+							sizeKB = floor(sizeNum * 1024 * 1024)
+						elseif (unit = "MB")
+							// Convert Megabytes to Kilobytes
+							sizeKB = floor(sizeNum * 1024)
+						}
+						
+						add(blockDevices, [:name = currentDisk, :size = sizeKB])
+						
+						// Reset currentDisk so we are ready to find the next physical disk
+						currentDisk = ""
+					}
+				}
+			}
 		elseif (isFreeBSD())
 			// Use geom to get disk information
 			diskOutput = systemCmd("geom disk list")
