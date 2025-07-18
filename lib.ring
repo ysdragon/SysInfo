@@ -268,6 +268,17 @@ class SysInfo {
 				:used = memInfo[1] - (memInfo[2] * memInfo[3]),
 				:swap = memInfo[4]
 			]
+		elseif (isMacOSX()) // If the OS is macOS
+			// Get ramInfo from memoryInfo
+			memInfo = memoryInfo()
+
+			// Add memory values to ramInfo
+			ramInfo = [
+				:size = floor(memInfo[1]),
+				:free = floor(memInfo[2]),
+				:used = floor(memInfo[3]),
+				:swap = memInfo[4]
+			]
 		}
 				
 		// Return Ram info
@@ -877,6 +888,89 @@ class SysInfo {
 					}
 				}
 			}
+		elseif (isMacOSX()) // If the OS is macOS
+			// Get page size
+			pageSize = number(systemCmd("sysctl -n hw.pagesize"))
+
+			// Get vm_stat output
+			vmStatOutput = systemCmd("vm_stat")
+			vmStatLines = split(vmStatOutput, nl)
+
+			// Defaults
+			pagesFree = 0
+			pagesActive = 0
+			pagesInactive = 0
+			pagesWired = 0
+
+			// Start loop after the header lines
+			for i = 2 to len(vmStatLines) {
+				if (substr(vmStatLines[i], ":")) {
+					parts = split(vmStatLines[i], ":")
+					if (len(parts) > 1) {
+						key = trim(parts[1])
+						valueStr = trim(parts[2])
+						if (right(valueStr, 1) = ".") {
+							valueStr = left(valueStr, len(valueStr) - 1)
+						}
+						
+						if (!isNull(valueStr)) {
+							value = number(valueStr)
+							switch lower(key) {
+								case "pages free"
+									pagesFree = value
+								case "pages active"
+									pagesActive = value
+								case "pages inactive"
+									pagesInactive = value
+								case "pages wired down"
+									pagesWired = value
+							}
+						}
+					}
+				}
+			}
+			
+			// Get swap info
+			swapInfo = systemCmd("sysctl vm.swapusage")
+			swapTotal = 0
+			if (substr(swapInfo, "total = ")) {
+				totalPart = split(swapInfo, "total = ")[2]
+				spacePos = substr(trim(totalPart), " ")
+				if (spacePos > 0) {
+					swapTotalStr = left(trim(totalPart), spacePos - 1)
+				else
+					swapTotalStr = trim(totalPart)
+				}
+				
+				unit = right(swapTotalStr, 1)
+				valStr = left(swapTotalStr, len(swapTotalStr)-1)
+				
+				if (!isNull(valStr)) {
+					val = number(valStr)
+					if (val > 0) {
+						if (unit = "M") {
+							swapTotal = floor(val * 1024) // in KB
+						elseif (unit = "G")
+							swapTotal = floor(val * 1024 * 1024) // in KB
+						else // assume K
+							swapTotal = floor(val)
+						}
+					else
+						swapTotal = 0 // no swap
+					}
+				}
+			}
+
+			totalMem = number(systemCmd("sysctl -n hw.memsize")) / 1024 // total in KB
+			freeMem = (pagesFree * pageSize) / 1024 // free in KB
+			usedMem = (totalMem - freeMem) / 1024 // used in KB
+
+			memInfo = [
+				totalMem,
+				freeMem,
+				usedMem,
+				swapTotal
+			]
 		elseif (isFreeBSD()) // If the OS is FreeBSD
 			// Get memory info using sysctl
 			memInfoRaw = systemCmd("sysctl -n hw.physmem vm.stats.vm.v_free_count vm.stats.vm.v_page_size vm.swap_total")
