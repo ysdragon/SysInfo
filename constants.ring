@@ -239,6 +239,7 @@ filteredStorageParts = [
 	"devtmpfs",
 	"dev",
 	"devfs",
+	"map",
 	"run",
 	"shm",
 	"proc",
