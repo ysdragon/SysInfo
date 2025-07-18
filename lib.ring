@@ -504,7 +504,7 @@ class SysInfo {
 					}
 				}
 			}
-		elseif (isFreeBSD()) // If the OS is FreeBSD
+		elseif (isFreeBSD() || isMacOSX()) // If the OS is FreeBSD or macOS
 			model = trim(systemCmd("sysctl -n hw.model"))
 		}
 
