@@ -39,7 +39,7 @@ class SysInfoTest {
 		testStorageParts()
 		testSysUptime()
 		testArch()
-		testPCount()
+		testPackageManager()
 		testIsVM()
 		testNetwork()
 		
@@ -180,10 +180,13 @@ class SysInfoTest {
 		assert(len(arch) > 0, "Architecture should not be empty")
 	}
 
-	func testPCount() {
-		? "Testing pCount()..."
-		pcount = sysInfo.pCount()
-		assert(!isNull(pcount), "Package count should not be null")
+	func testPackageManager() {
+		? "Testing packageManager()..."
+		packageManagerInfo = sysInfo.packageManager()
+		assert(isList(packageManagerInfo), "Package manager info should be a list")
+		assert(!isNull(packageManagerInfo[:name]), "Package manager name should not be null")
+		assert(!isNull(packageManagerInfo[:count]), "Package count should not be null")
+		assert(number(packageManagerInfo[:count]) >= 0, "Package count should be non-negative")
 	}
 
 	func testIsVM() {
