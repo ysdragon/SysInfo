@@ -526,6 +526,10 @@ class SysInfo {
 			osInfo[:name] = winSysInfo[:os]    
 			// Set the OS id to windows
 			osInfo[:id] = "windows"
+		elseif (isMacOSX())
+			// Get macOS name and version
+			osInfo[:name] = trim(systemCmd("sw_vers -productName")) + " " + trim(systemCmd("sw_vers -productVersion"))
+			osInfo[:id] = "macos"
 		else // Else (If the OS is (Unix-like))
 			// Read /etc/os-release content
 			content = readFile("/etc/os-release")
