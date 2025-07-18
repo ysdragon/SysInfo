@@ -199,7 +199,7 @@ pManagers = [
 		:supported = [
 			"any"
 		],
-		:cmd = "brew list --cellar | wc -l",
+		:cmd = "brew list | wc -l",
 		:name = "brew"
 	]
 ]
