@@ -201,6 +201,13 @@ pManagers = [
 		],
 		:cmd = "brew list | wc -l",
 		:name = "brew"
+	],
+	:bin = [
+		:supported = [
+			"other"
+		],
+		:cmd = "ls /usr/bin | wc -l",
+		:name = "bin"
 	]
 ]
 
