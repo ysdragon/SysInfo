@@ -158,11 +158,13 @@ uptimeMinutesSeconds = sys.sysUptime([:minutes = 1, :seconds = 1])
 ? "Uptime (Minutes & Seconds): " + uptimeMinutesSeconds
 ```
 
-## Package Count
+
+## Package Manager Information
 
 ```ring
-packageCount = sys.pCount()
-? "Installed Packages/Programs: " + packageCount
+packageManagerInfo = sys.packageManager()
+? "Package Manager Name: " + packageManagerInfo[:name]
+? "Installed Package Count: " + packageManagerInfo[:count]
 ```
 
 ## Virtual Machine Detection

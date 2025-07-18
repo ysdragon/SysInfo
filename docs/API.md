@@ -108,9 +108,11 @@ Calculates and formats the system uptime.
 Retrieves the system architecture.
 - **Returns**: `String` - System architecture (e.g., "amd64").
 
-### `pCount()`
-Retrieves the count of installed packages (Linux/FreeBSD) or programs via Winget (Windows).
-- **Returns**: `String` - Package/program count, often with the package manager name (e.g., "1500 (dpkg)").
+### `packageManager()`
+Retrieves information about installed packages/programs on the system.
+- **Returns**: `List` - A list containing:
+    - `:name` (String): The name of the primary package manager detected (e.g., "dpkg" "brew").
+    - `:count` (Number): The total count of installed packages/programs.
 
 ### `isVM()`
 Checks if the system is likely a virtual machine.
