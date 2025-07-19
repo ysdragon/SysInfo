@@ -117,6 +117,8 @@ Check out ***[RingFetch](https://github.com/ysdragon/SysInfo/tree/main/examples)
   - Windows Server 2019
   - Windows Server 2022
   - Windows Server 2025
+- **<img width="20" height="20" src="https://www.apple.com/favicon.ico" /> macOS**
+    - macOS 14 (Sonoma)
 
 ## Contributing
 Public contributions are welcome!  
