@@ -1026,7 +1026,7 @@ class SysInfo {
 
 			totalMem = number(systemCmd("sysctl -n hw.memsize")) / 1024 // total in KB
 			freeMem = (pagesFree * pageSize) / 1024 // free in KB
-			usedMem = (totalMem - freeMem) / 1024 // used in KB
+			usedMem = totalMem - freeMem // used in KB
 
 			memInfo = [
 				totalMem,
