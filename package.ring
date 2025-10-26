@@ -10,7 +10,7 @@ aPackageInfo = [
 	:versions = 	[
 		[
 			:version = "1.3.0",
-			:branch = "master"
+			:branch = "v1.3.0"
 		]
 	],
 	:libs = 	[
@@ -88,3 +88,4 @@ aPackageInfo = [
 	:providerusername = "ysdragon",
 	:providerwebsite = "github.com"
 ]
+
