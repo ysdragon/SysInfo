@@ -16,6 +16,6 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run tests
-        uses: ysdragon/ring-action@v1.1.0
+        uses: ysdragon/ring-action@v1.2.3
         with:
           file: "tests/SysInfo_test.ring"
