@@ -19,7 +19,7 @@ class SysInfo {
 		fclose(fp)
 
 		// Execute PowerShell script with security bypass
-		cmd = systemCmd("powershell -NoProfile -ExecutionPolicy Bypass -File " + psTempScript)
+		cmd = systemCmd('powershell -NoProfile -ExecutionPolicy Bypass -File "' + psTempScript + '"')
 
 		// Process results 
 		winSysInfo = json2List(cmd)
