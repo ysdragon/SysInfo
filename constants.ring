@@ -9,6 +9,7 @@
 PS_SCRIPT = `$MODEL = (Get-CimInstance -ClassName Win32_ComputerSystem).Model
 $CPU_INFO = (Get-CimInstance -Query 'SELECT Name, NumberOfCores, NumberOfLogicalProcessors FROM Win32_Processor')
 $CPU_USAGE = (Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 1 -MaxSamples 1 -ErrorAction SilentlyContinue).CounterSamples.CookedValue
+$CPU_USAGE = 0 + $CPU_USAGE
 $CPU_MODELS = @()
 $CPU_COUNT = 0
 $TOTAL_CORES = 0
